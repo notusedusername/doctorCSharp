@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DoctorCSharpServer.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -18,6 +19,7 @@ namespace DoctorCSharpServer
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            DatabaseConnection.getInstance().initializeWith(configuration.GetConnectionString("database"));
         }
 
         public IConfiguration Configuration { get; }

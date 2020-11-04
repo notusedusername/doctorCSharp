@@ -4,5 +4,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Properties\NewFolder\**" />
+    <Content Remove="Properties\NewFolder\**" />
+    <EmbeddedResource Remove="Properties\NewFolder\**" />
+    <None Remove="Properties\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+
 
 </Project>
