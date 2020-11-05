@@ -1,4 +1,10 @@
-﻿CREATE TABLE Patient (
+﻿IF OBJECT_ID('Treatment') IS NOT NULL
+	DROP TABLE Treatment
+
+IF OBJECT_ID('Patient') IS NOT NULL
+	DROP TABLE Patient
+
+CREATE TABLE Patient (
 	id INT IDENTITY PRIMARY KEY,
 	[name] VARCHAR(300) NOT NULL,
 	TAJ_nr VARCHAR(11) UNIQUE,
@@ -7,13 +13,13 @@
 )
 GO
 
-
 CREATE TABLE Treatment (
 	id INT IDENTITY PRIMARY KEY,
 	patient_id INT,
 	arrival DATETIME NOT NULL DEFAULT GETDATE(),
 	complaint VARCHAR(1000) NOT NULL,
 	diagnosis VARCHAR(4000) NOT NULL,
+	isClosed CHAR(1) NOT NULL DEFAULT 'F',
 	CONSTRAINT FK_treatment_patinent_id FOREIGN KEY (patient_id) REFERENCES Patient(id)
 )
 GO
