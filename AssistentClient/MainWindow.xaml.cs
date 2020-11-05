@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using AssistentClient.ViewModels;
 
 namespace AssistentClient
 {
@@ -23,6 +24,16 @@ namespace AssistentClient
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new HomeViewModel();
+        }
+        private void ChangeView_Clicked(object sender, RoutedEventArgs e)
+        {
+            DataContext = new ChangeViewModel();
+        }
+
+        private void HomeView_Clicked(object sender, RoutedEventArgs e)
+        {
+            DataContext = new HomeViewModel();
         }
     }
 }
