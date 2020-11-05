@@ -1,0 +1,19 @@
+﻿CREATE TABLE Patient (
+	id INT PRIMARY KEY,
+	[name] VARCHAR(300) NOT NULL,
+	TAJ_nr VARCHAR(11) UNIQUE,
+	[address] VARCHAR(1000) NOT NULL,
+	phone VARCHAR(20) NOT NULL
+)
+GO
+
+
+CREATE TABLE Treatment (
+	id INT PRIMARY KEY,
+	patient_id INT,
+	arrival DATETIME NOT NULL DEFAULT GETDATE(),
+	complaint VARCHAR(1000) NOT NULL,
+	diagnosis VARCHAR(4000) NOT NULL
+)
+GO
+
