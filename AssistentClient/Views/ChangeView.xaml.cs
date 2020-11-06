@@ -75,5 +75,15 @@ namespace AssistentClient.Views
             AddressLabel.Content = "";
             ComplaintTextBox.Text = "";
         }
+
+        private void SearchIDButton_Click(object sender, RoutedEventArgs e)
+        {
+            SearchIDTextBox.Text = "";
+        }
+
+        private void SearchNameButton_Click(object sender, RoutedEventArgs e)
+        {
+            SearchNameTextBox.Text = "";
+        }
     }
 }
