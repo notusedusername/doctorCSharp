@@ -3,10 +3,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewmodels="clr-namespace:DoctorClient.ViewModels"
+        xmlns:views="clr-namespace:DoctorClient.Views"
         xmlns:local="clr-namespace:DoctorClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="450" Width="800" ResizeMode="NoResize">
+    <Grid Background="Green">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ListBox x:Name="ItemListBox" Background="Transparent" FontSize="18" Foreground="White" BorderThickness="1" BorderBrush="White" Margin="50,30,99,53" SelectionChanged="ItemListBox_SelectionChanged" Grid.RowSpan="6" Grid.ColumnSpan="2"/>
+        <Button Foreground="White" Background="Transparent" BorderBrush="White" BorderThickness="2" FontSize="18" Click="Button_Click"  Content="Select"   Height="39" Width="65"  Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
+
 
     </Grid>
 </Window>
