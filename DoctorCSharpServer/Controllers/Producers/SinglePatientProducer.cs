@@ -16,7 +16,6 @@ namespace DoctorCSharpServer.Controllers.Producers
         public SinglePatientProducer(int id)
         {
             this.id = id;
-            Console.WriteLine(id);
         }
 
         protected override void addParameters(SqlCommand command)
