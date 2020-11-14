@@ -1,4 +1,6 @@
-﻿using DoctorCSharpServer.Controllers.Producers;
+﻿using DoctorCSharpServer.Controllers.Exceptions;
+using DoctorCSharpServer.Controllers.Manipulators;
+using DoctorCSharpServer.Controllers.Producers;
 using DoctorCSharpServer.Model.Items;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,35 +18,46 @@ namespace DoctorCSharpServer.Controllers
     [ApiController]
     public class PatientController : ControllerBase
     {
-        // GET: api/<PatientController>
         [HttpGet]
         public ActionResult<IEnumerable<Patient>> Get(string filter)
         {
+            logRequest(Request);
             return Ok(new PatientListProducer(filter).select());
         }
 
-        // GET api/<PatientController>/5
+
         [HttpGet("{id}")]
         public ActionResult<Patient> Get(int id)
         {
+            logRequest(Request);
             var selectedList = new SinglePatientProducer(id).select();
-            if(selectedList.Count() < 1)
+            if (selectedList.Count() < 1)
             {
-                return BadRequest(createErrorMessage("No patient found with the specified id!"));
+                Console.WriteLine("No patient found with the id " + id + "!");
+                return BadRequest(new Response("No patient found with the id " + id + "!"));
             }
             else
             {
                 return Ok(selectedList.First());
             }
-            
+
         }
 
-       
 
-        // POST api/<PatientController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public ActionResult<Response> Post([FromForm] SerializedPatient newPatient)
         {
+            logRequest(Request);
+            try
+            {
+                return new PatientCreator(newPatient).execute();
+            }
+            catch (InvalidInputException e)
+            {
+                Console.WriteLine(e.message);
+                return BadRequest(new Response(e.message));
+            }
+            
         }
 
         // PUT api/<PatientController>/5
@@ -59,9 +72,10 @@ namespace DoctorCSharpServer.Controllers
         {
         }
 
-        private string createErrorMessage(string message)
+        private void logRequest(HttpRequest request)
         {
-            return ("{\"error\": \"" + message + "\" }");
+            Console.WriteLine("REST request\nMethod: " + request.Method + "\nPath: " +  request.Path);
         }
+
     }
 }
