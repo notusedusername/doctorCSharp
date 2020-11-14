@@ -2,6 +2,7 @@
 using DoctorCSharpServer.Model.Items;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,10 +25,21 @@ namespace DoctorCSharpServer.Controllers
 
         // GET api/<PatientController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public ActionResult<Patient> Get(int id)
         {
-            return "value";
+            var selectedList = new SinglePatientProducer(id).select();
+            if(selectedList.Count() < 1)
+            {
+                return BadRequest(createErrorMessage("No patient found with the specified id!"));
+            }
+            else
+            {
+                return Ok(selectedList.First());
+            }
+            
         }
+
+       
 
         // POST api/<PatientController>
         [HttpPost]
@@ -45,6 +57,11 @@ namespace DoctorCSharpServer.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        private string createErrorMessage(string message)
+        {
+            return ("{\"error\": \"" + message + "\" }");
         }
     }
 }
