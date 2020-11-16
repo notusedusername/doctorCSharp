@@ -24,17 +24,17 @@ namespace AssistentClient.Views
         {
             InitializeComponent();
 
-            patientsList.Add(new Patient(1, "asd1", "addr1", "111", "","11111"));
-            patientsList.Add(new Patient(2, "asd2", "addr2", "222", "","22222"));
-            patientsList.Add(new Patient(3, "asd3", "addr3", "333", "","33333"));
-            patientsList.Add(new Patient(4, "asd4", "addr4", "444", "","44444"));
-            patientsList.Add(new Patient(5, "asd5", "addr5", "555", "","55555"));
-            patientsList.Add(new Patient(6, "asd6", "addr6", "666", "","66666"));
-            patientsList.Add(new Patient(7, "asd7", "addr7", "777", "","77777"));
-            patientsList.Add(new Patient(7, "asd8", "addr8", "888", "", "88888"));
-            patientsList.Add(new Patient(7, "asd9", "addr9", "999", "", "99999"));
-            patientsList.Add(new Patient(7, "asd10", "addr10", "100", "", "10000"));
-            patientsList.Add(new Patient(7, "asd11", "addr11", "111", "", "11000"));
+            patientsList.Add(new Patient("asd1", "addr1", "111","11111"));
+            patientsList.Add(new Patient("asd2", "addr2", "222", "22222"));
+            patientsList.Add(new Patient("asd3", "addr3", "333","33333"));
+            patientsList.Add(new Patient("asd4", "addr4", "444", "44444"));
+            patientsList.Add(new Patient("asd5", "addr5", "555", "55555"));
+            patientsList.Add(new Patient("asd6", "addr6", "666", "66666"));
+            patientsList.Add(new Patient("asd7", "addr7", "777", "77777"));
+            patientsList.Add(new Patient("asd8", "addr8", "888",  "88888"));
+            patientsList.Add(new Patient("asd9", "addr9", "999",  "99999"));
+            patientsList.Add(new Patient("asd10", "addr10", "100",  "10000"));
+            patientsList.Add(new Patient("asd11", "addr11", "111",  "11000"));
 
             for (int i = 0; i < patientsList.Count; i++)
             {
