@@ -44,6 +44,7 @@ namespace DoctorCSharpServer.Controllers.Producers
        
         }
 
+
         protected abstract void addParameters(SqlCommand command);
 
         protected abstract Object getItemFromReader(SqlDataReader reader);

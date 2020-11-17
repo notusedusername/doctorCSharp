@@ -30,4 +30,6 @@ namespace DoctorCSharpServer.Controllers.Manipulators
 
         protected abstract string getSqlCommand();
         }
-    }
+
+}
+    
