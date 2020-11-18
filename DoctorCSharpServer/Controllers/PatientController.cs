@@ -77,11 +77,19 @@ namespace DoctorCSharpServer.Controllers
         }
 
         // DELETE api/<PatientController>/5
-        [HttpDelete("{id}")]
-        public ActionResult<Patient> Delete(int id)
+        [HttpDelete]
+        public ActionResult<Response> Delete([FromForm] SerializedPatient newPatient)
         {
             logRequest(Request);
-            return Ok();
+            try
+            {
+                return new PatientRemover(newPatient).execute();
+            }
+            catch (InvalidInputException e)
+            {
+                Console.WriteLine(e.message);
+                return BadRequest(new Response(e.message));
+            }
         }
 
         private void logRequest(HttpRequest request)

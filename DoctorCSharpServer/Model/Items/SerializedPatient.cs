@@ -28,6 +28,10 @@ namespace DoctorCSharpServer.Model.Items
             validateAddress();
             validatePhone();
         }
+        public void validate_taj()
+        {
+            validateTAJ();
+        }
 
         private void validateName()
         {
