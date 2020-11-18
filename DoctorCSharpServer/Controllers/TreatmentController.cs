@@ -17,38 +17,21 @@ namespace DoctorCSharpServer.Controllers
     public class TreatmentController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<IEnumerable<Patient>> Get(string filter)
+        [Route("active")]
+        public ActionResult<IEnumerable<Patient>> Get()
         {
             logRequest(Request);
-            return Ok(new TreatmentListProducer(filter).select());
-        }
-
-
-        [HttpGet("{id}")]
-        public ActionResult<Patient> Get(int id)
-        {
-            logRequest(Request);
-            var selectedList = new SingleTreatmentProducer(id).select();
-            if (selectedList.Count() < 1)
-            {
-                Console.WriteLine("No treatment found with the id " + id + "!");
-                return BadRequest(new Response("No treatment found with the id " + id + "!"));
-            }
-            else
-            {
-                return Ok(selectedList.First());
-            }
-
+            return Ok(new ActiveComplaintListProducer().select());
         }
 
         
-        [HttpPost("{id}")]
-        public ActionResult<Response> Post([FromForm] SerializedTreatment newTreatment)
+        [HttpPost("active/{id}")]
+        public ActionResult<Response> Post(int id, [FromForm] string complaint)
         {
             logRequest(Request);
             try
             {
-                return new TreatmentCreator(newTreatment).execute();
+                return new TreatmentCreator(id, complaint).execute();
             }
             catch (InvalidInputException e)
             {
@@ -57,39 +40,7 @@ namespace DoctorCSharpServer.Controllers
             }
 
         }
-        /*
-        // PUT api/<PatientController>/5
-        [HttpPut]
-        public ActionResult<Response> Put([FromForm] SerializedPatient newPatient)
-        {
-            logRequest(Request);
-            try
-            {
-                return new PatientUpdater(newPatient).execute();
-            }
-            catch (InvalidInputException e)
-            {
-                Console.WriteLine(e.message);
-                return BadRequest(new Response(e.message));
-            }
-        }
-
-        // DELETE api/<PatientController>/5
-        [HttpDelete]
-        public ActionResult<Response> Delete([FromForm] SerializedPatient newPatient)
-        {
-            logRequest(Request);
-            try
-            {
-                return new PatientRemover(newPatient).execute();
-            }
-            catch (InvalidInputException e)
-            {
-                Console.WriteLine(e.message);
-                return BadRequest(new Response(e.message));
-            }
-        }
-        */
+      
 
         private void logRequest(HttpRequest request)
         {

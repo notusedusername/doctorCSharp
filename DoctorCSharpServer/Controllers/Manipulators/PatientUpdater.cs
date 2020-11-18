@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DoctorCSharpServer.Model.Items;
 using System.Data.SqlClient;
+using DoctorCSharpServer.Controllers.Exceptions;
 
 namespace DoctorCSharpServer.Controllers.Manipulators
 {
@@ -48,13 +49,13 @@ namespace DoctorCSharpServer.Controllers.Manipulators
             if ((int)returnValue.Value == -1)
             {
                 Console.WriteLine("There is not exists a patient with the id " + id + "!");
-                return new Response("There is not exists a patient with the id " + id + "!");
+                throw new InvalidInputException("There is not exists a patient with the id " + id + "!");
 
             }
             else if((int)returnValue.Value == -2)
             {
                 Console.WriteLine("The TAJ belongs to another patient!");
-                return new Response("The TAJ belongs to another patient!");
+                throw new InvalidInputException("The TAJ belongs to another patient!");
             }
             return new Response("Patient successfully updated!");
         }

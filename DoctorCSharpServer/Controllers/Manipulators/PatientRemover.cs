@@ -1,4 +1,5 @@
-﻿using DoctorCSharpServer.Model.Items;
+﻿using DoctorCSharpServer.Controllers.Exceptions;
+using DoctorCSharpServer.Model.Items;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -36,7 +37,7 @@ namespace DoctorCSharpServer.Controllers.Manipulators
             if ((int)returnValue.Value == -1)
             {
                 Console.WriteLine("There is not exists a patient with id " + id + "!");
-                return new Response("There is not exists a patient with id " + id + "!");
+                throw new InvalidInputException("There is not exists a patient with id " + id + "!");
 
             }
             return new Response("Patient successfully deleted!");

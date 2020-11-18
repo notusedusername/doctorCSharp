@@ -1,4 +1,5 @@
-﻿using DoctorCSharpServer.Model.Items;
+﻿using DoctorCSharpServer.Controllers.Exceptions;
+using DoctorCSharpServer.Model.Items;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -9,45 +10,55 @@ namespace DoctorCSharpServer.Controllers.Manipulators
 {
     public class TreatmentCreator : AbstractManipulator
     {
-        private SerializedTreatment treatment { get; }
+        private string complaint { get; }
+
+        private int id { get;  }
 
         private SqlParameter returnValue { get; set; }
 
-        public TreatmentCreator(SerializedTreatment treatment)
+        public TreatmentCreator(int id, string complaint)
         {
-            this.treatment = treatment;
+            this.complaint = complaint;
+            this.id = id;
         }
         protected override void addParameters(SqlCommand command)
         {
             validateParameters();
             command.CommandType = System.Data.CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@patient_id", treatment.patient_id);
-            command.Parameters.AddWithValue("@arrival", treatment.arrival);
-            command.Parameters.AddWithValue("@complaint", treatment.complaint);
-            command.Parameters.AddWithValue("@diagnosis", treatment.diagnosis);
-            command.Parameters.AddWithValue("@isClosed", treatment.isClosed);
+            command.Parameters.AddWithValue("@patient_id", id);
+            command.Parameters.AddWithValue("@complaint", complaint);
             this.returnValue = command.Parameters.Add("@returnValue", System.Data.SqlDbType.Int);
             returnValue.Direction = System.Data.ParameterDirection.ReturnValue;
         }
 
         private void validateParameters()
         {
-            treatment.validate();
+            if (string.IsNullOrWhiteSpace(complaint))
+            {
+                throw new InvalidInputException("The complaint can not be empty!");
+            }
         }
 
         protected override string getSqlCommand()
         {
-            return "insert_treatment";
+            return "pick_up_patient_complaint";
         }
 
         protected override Response getSuccessMessage()
         {
             if ((int)returnValue.Value == -1)
             {
-                Console.WriteLine("There is already a treatment with this patient_id!");
-                return new Response("There is already a patient with this patient_id");
+                Console.WriteLine("There is no patient with the id " + id + "!");
+                throw new InvalidInputException("There is no patient with the id " + id + "!");
 
             }
+            else if ((int)returnValue.Value == -2)
+            {
+                Console.WriteLine("The patient is waiting for treatment.");
+                throw new InvalidInputException("The patient is waiting for treatment! You can not pick up new treatment while the older one is not closed.");
+
+            }
+
             return new Response("New treatment successfully saved!");
         }
     }

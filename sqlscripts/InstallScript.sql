@@ -18,7 +18,7 @@ CREATE TABLE Treatment (
 	patient_id INT,
 	arrival DATETIME NOT NULL DEFAULT GETDATE(),
 	complaint VARCHAR(1000) NOT NULL,
-	diagnosis VARCHAR(4000) NOT NULL,
+	diagnosis VARCHAR(4000),
 	isClosed CHAR(1) NOT NULL DEFAULT 'F',
 	CONSTRAINT FK_treatment_patinent_id FOREIGN KEY (patient_id) REFERENCES Patient(id)
 )

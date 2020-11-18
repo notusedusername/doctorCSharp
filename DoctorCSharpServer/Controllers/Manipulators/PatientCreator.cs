@@ -1,4 +1,5 @@
-﻿using DoctorCSharpServer.Model.Items;
+﻿using DoctorCSharpServer.Controllers.Exceptions;
+using DoctorCSharpServer.Model.Items;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -44,7 +45,7 @@ namespace DoctorCSharpServer.Controllers.Manipulators
             if((int) returnValue.Value == -1)
             {
                 Console.WriteLine("There is already a patient with this TAJ number!");
-                return new Response("There is already a patient with this TAJ number!");
+                throw new InvalidInputException("There is already a patient with this TAJ number!");
 
             }
             return new Response("New patient successfully saved!");
