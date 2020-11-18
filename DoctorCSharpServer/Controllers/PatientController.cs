@@ -45,6 +45,7 @@ namespace DoctorCSharpServer.Controllers
 
 
         [HttpPost]
+        // Here the id is not needed, because we have auto incremented id
         public ActionResult<Response> Post([FromForm] SerializedPatient newPatient)
         {
             logRequest(Request);
@@ -60,7 +61,7 @@ namespace DoctorCSharpServer.Controllers
             
         }
 
-        // PUT api/<PatientController>/5
+        //Here the id is necessary to identify the record
         [HttpPut("{id}")]
         public ActionResult<Response> Put(int id, [FromForm] SerializedPatient newPatient)
         {
@@ -76,14 +77,14 @@ namespace DoctorCSharpServer.Controllers
             }
         }
 
-        // DELETE api/<PatientController>/5
-        [HttpDelete]
-        public ActionResult<Response> Delete([FromForm] SerializedPatient newPatient)
+        //Here the id is necessary to identify the record
+        [HttpDelete("{id}")]
+        public ActionResult<Response> Delete(int id)
         {
             logRequest(Request);
             try
             {
-                return new PatientRemover(newPatient).execute();
+                return new PatientRemover(id).execute();
             }
             catch (InvalidInputException e)
             {

@@ -9,26 +9,21 @@ namespace DoctorCSharpServer.Controllers.Manipulators
 {
     public class PatientRemover : AbstractManipulator
     {
-        private SerializedPatient patient { get; }
+        private int id { get; }
 
         private SqlParameter returnValue { get; set; }
 
-        public PatientRemover(SerializedPatient patient)
+        public PatientRemover(int id)
         {
-            this.patient = patient;
+            this.id = id; ;
         }
 
         protected override void addParameters(SqlCommand command)
         {
-            validateParameters();
             command.CommandType = System.Data.CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@TAJ_nr", patient.TAJ_nr);
+            command.Parameters.AddWithValue("@id", id); ;
             this.returnValue = command.Parameters.Add("@returnValue", System.Data.SqlDbType.Int);
             returnValue.Direction = System.Data.ParameterDirection.ReturnValue;
-        }
-        private void validateParameters()
-        {
-            patient.validate_taj();
         }
 
         protected override string getSqlCommand()
@@ -40,8 +35,8 @@ namespace DoctorCSharpServer.Controllers.Manipulators
         {
             if ((int)returnValue.Value == -1)
             {
-                Console.WriteLine("There is not exists a patient with this TAJ number!");
-                return new Response("There is not exists a patient with this TAJ number!");
+                Console.WriteLine("There is not exists a patient with id " + id + "!");
+                return new Response("There is not exists a patient with id " + id + "!");
 
             }
             return new Response("Patient successfully deleted!");

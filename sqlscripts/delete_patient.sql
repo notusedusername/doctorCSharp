@@ -5,11 +5,14 @@ END
 GO
 
 ALTER PROCEDURE delete_patient
-	@TAJ_nr VARCHAR(11)
+	@id INT
 AS
 BEGIN
-	IF EXISTS (SELECT 1 FROM Patient WHERE TAJ_nr = @TAJ_nr)
-		DELETE FROM Patient WHERE TAJ_nr = @TAJ_nr ;
+	IF EXISTS (SELECT 1 FROM Patient WHERE id = @id)
+	BEGIN
+		DELETE FROM Treatment WHERE id = @id        -- Delete all treatments of deleted patient first, because of the foreign key constraint on patient_id
+		DELETE FROM Patient WHERE id = @id
+	END
 	ELSE
 		return -1
 
