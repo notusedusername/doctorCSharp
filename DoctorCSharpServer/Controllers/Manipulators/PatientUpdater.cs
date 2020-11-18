@@ -11,10 +11,13 @@ namespace DoctorCSharpServer.Controllers.Manipulators
     {
         private SerializedPatient patient { get; }
 
+        private int id { get; }
+
         private SqlParameter returnValue { get; set; }
 
-        public PatientUpdater(SerializedPatient patient)
+        public PatientUpdater(int id,  SerializedPatient patient)
         {
+            this.id = id;
             this.patient = patient;
         }
 
@@ -22,6 +25,7 @@ namespace DoctorCSharpServer.Controllers.Manipulators
         {
             validateParameters();
             command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@id", id);
             command.Parameters.AddWithValue("@name", patient.name);
             command.Parameters.AddWithValue("@TAJ_nr", patient.TAJ_nr);
             command.Parameters.AddWithValue("@address", patient.address);
@@ -37,16 +41,20 @@ namespace DoctorCSharpServer.Controllers.Manipulators
         protected override string getSqlCommand()
         {
             return "update_patient";
-            //return "UPDATE Patient SET [name] = @name,[address] = @address,phone = @phone WHERE TAJ_nr = @TAJ_nr";
         }
 
         protected override Response getSuccessMessage()
         {
             if ((int)returnValue.Value == -1)
             {
-                Console.WriteLine("There is not exists a patient with this TAJ number!");
-                return new Response("There is not exists a patient with this TAJ number!");
+                Console.WriteLine("There is not exists a patient with the id " + id + "!");
+                return new Response("There is not exists a patient with the id " + id + "!");
 
+            }
+            else if((int)returnValue.Value == -2)
+            {
+                Console.WriteLine("The TAJ belongs to another patient!");
+                return new Response("The TAJ belongs to another patient!");
             }
             return new Response("Patient successfully updated!");
         }

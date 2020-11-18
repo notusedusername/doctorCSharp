@@ -5,16 +5,19 @@ END
 GO
 
 ALTER PROCEDURE update_patient
+	@id INT,
 	@name VARCHAR(300),
 	@TAJ_nr VARCHAR(11),
 	@address VARCHAR(1000),
 	@phone VARCHAR(20)
 AS
 BEGIN
-	IF EXISTS (SELECT 1 FROM Patient WHERE TAJ_nr = @TAJ_nr)
-		UPDATE Patient SET [name] = @name, [address] = @address,phone = @phone WHERE TAJ_nr = @TAJ_nr;
+	IF NOT EXISTS (SELECT 1 FROM Patient WHERE id = @id)
+		RETURN -1
+	IF EXISTS (SELECT 1 FROM Patient WHERE TAJ_nr = @TAJ_nr AND id <> @id)
+		RETURN -2
 	ELSE
-		return -1
+		UPDATE Patient SET [name] = @name, [address] = @address,phone = @phone, TAJ_nr = @TAJ_nr WHERE id = @id
 
 END
 GO

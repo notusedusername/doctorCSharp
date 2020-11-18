@@ -44,7 +44,7 @@ namespace DoctorCSharpServer.Controllers
         }
 
 
-        [HttpPost("{id}")]
+        [HttpPost]
         public ActionResult<Response> Post([FromForm] SerializedPatient newPatient)
         {
             logRequest(Request);
@@ -61,13 +61,13 @@ namespace DoctorCSharpServer.Controllers
         }
 
         // PUT api/<PatientController>/5
-        [HttpPut]
-        public ActionResult<Response> Put([FromForm] SerializedPatient newPatient)
+        [HttpPut("{id}")]
+        public ActionResult<Response> Put(int id, [FromForm] SerializedPatient newPatient)
         {
             logRequest(Request);
             try
             {
-                return new PatientUpdater(newPatient).execute();
+                return new PatientUpdater(id, newPatient).execute();
             }
             catch (InvalidInputException e)
             {
