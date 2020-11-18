@@ -40,7 +40,24 @@ namespace DoctorCSharpServer.Controllers
             }
 
         }
-      
+
+
+        [HttpPut("active/{id}")]
+        public ActionResult<Response> Put(int id, [FromForm] string diagnosis)
+        {
+            logRequest(Request);
+            try
+            {
+                return new DiagnosisCreator(id, diagnosis).execute();
+            }
+            catch (InvalidInputException e)
+            {
+                Console.WriteLine(e.message);
+                return BadRequest(new Response(e.message));
+            }
+
+        }
+
 
         private void logRequest(HttpRequest request)
         {

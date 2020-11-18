@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace DoctorCSharpServer.Controllers.Manipulators
 {
-    public class TreatmentCreator : AbstractManipulator
+    public class DiagnosisCreator : AbstractManipulator
     {
-        private string complaint { get; }
+        private string diagnosis { get; }
 
-        private int id { get;  }
+        private int id { get; }
 
         private SqlParameter returnValue { get; set; }
 
-        public TreatmentCreator(int id, string complaint)
+        public DiagnosisCreator(int id, string diagnosis)
         {
-            this.complaint = complaint;
+            this.diagnosis = diagnosis;
             this.id = id;
         }
         protected override void addParameters(SqlCommand command)
@@ -26,22 +26,22 @@ namespace DoctorCSharpServer.Controllers.Manipulators
             validateParameters();
             command.CommandType = System.Data.CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@patient_id", id);
-            command.Parameters.AddWithValue("@complaint", complaint);
+            command.Parameters.AddWithValue("@diagnosis", diagnosis);
             this.returnValue = command.Parameters.Add("@returnValue", System.Data.SqlDbType.Int);
             returnValue.Direction = System.Data.ParameterDirection.ReturnValue;
         }
 
         private void validateParameters()
         {
-            if (string.IsNullOrWhiteSpace(complaint))
+            if (string.IsNullOrWhiteSpace(diagnosis))
             {
-                throw new InvalidInputException("The " + nameof(complaint) + " can not be empty!");
+                throw new InvalidInputException("The " + nameof(diagnosis) + " can not be empty!");
             }
         }
 
         protected override string getSqlCommand()
         {
-            return "pick_up_patient_complaint";
+            return "set_patient_diagnosis";
         }
 
         protected override Response getSuccessMessage()
@@ -54,8 +54,8 @@ namespace DoctorCSharpServer.Controllers.Manipulators
             }
             else if ((int)returnValue.Value == -2)
             {
-                Console.WriteLine("The patient is waiting for treatment.");
-                throw new InvalidInputException("The patient is waiting for treatment! You can not pick up new treatment while the older one is not closed.");
+                Console.WriteLine("The patient is not waiting for diagnosis.");
+                throw new InvalidInputException("The patient is not waiting for diagnosis! You can not diagnose the patient if she/he is not present.");
 
             }
 
