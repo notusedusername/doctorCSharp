@@ -28,7 +28,7 @@ namespace DoctorCSharpServer.Controllers.Producers
 
         protected override string getSqlCommand()
         {
-            return "SELECT t.id, patient_id, p.name name, CONVERT(VARCHAR, arrival, 120), complaint FROM Treatment t inner join patient p on t.patient_id = p.id WHERE t.isClosed = 'F'";
+            return "SELECT t.id, patient_id, p.name name, CONVERT(VARCHAR, arrival, 120), complaint FROM Treatment t inner join patient p on t.patient_id = p.id WHERE t.isClosed = 'F' ORDER BY arrival ASC";
         }
     }
 }
