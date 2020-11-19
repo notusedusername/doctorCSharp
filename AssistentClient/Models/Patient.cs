@@ -1,5 +1,6 @@
 ﻿using AssistentClient.Exceptions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -9,6 +10,7 @@ namespace AssistentClient.Models
 {
     public class Patient
     {
+        public int id { get; set; }
         public string name { get; set; }
         public string address { get; set; }
         public string taj { get; set; }
@@ -18,8 +20,9 @@ namespace AssistentClient.Models
         {
             this.name = name;
         }
-        public Patient(string name, string address, string taj,string phone)
+        public Patient(int id,string name, string address, string taj,string phone)
         {
+            this.id = id;
             this.name = name;
             this.address = address;
             this.taj = taj;

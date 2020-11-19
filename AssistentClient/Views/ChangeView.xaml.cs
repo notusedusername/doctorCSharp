@@ -25,30 +25,15 @@ namespace AssistentClient.Views
         {
             InitializeComponent();
             getDatas();
-            //patientsList.Add(new Patient("asd1", "addr1", "111", "11111"));
-            //patientsList.Add(new Patient("asd2", "addr2", "222", "22222"));
-            //patientsList.Add(new Patient("asd3", "addr3", "333", "33333"));
-            //patientsList.Add(new Patient("asd4", "addr4", "444", "44444"));
-            //patientsList.Add(new Patient("asd5", "addr5", "555", "55555"));
-            //patientsList.Add(new Patient("asd6", "addr6", "666", "66666"));
-            //patientsList.Add(new Patient("asd7", "addr7", "777", "77777"));
-            //patientsList.Add(new Patient("asd8", "addr8", "888", "88888"));
-            //patientsList.Add(new Patient("asd9", "addr9", "999", "99999"));
-            //patientsList.Add(new Patient("asd10", "addr10", "100", "10000"));
-            //patientsList.Add(new Patient("asd11", "addr11", "111", "11000"));
-
-            //for (int i = 0; i < patientsList.Count; i++)
-            //{
-            //    patients.Add(new Patient(patientsList[i].name));
-            //}
-
         }
         List<Patient> patientsList = new List<Patient>();
         List<Patient> patients = new List<Patient>();
         static readonly HttpClient client = new HttpClient();
 
+
         private void bindListBox()
         {
+
             ItemListBox.ItemsSource = patients;
 
         }
@@ -63,7 +48,7 @@ namespace AssistentClient.Views
 
             for (int i = 0; i < sp.Length; i += 10)
             {
-                patientsList.Add(new Patient(sp[i + 3], sp[i + 5], sp[i + 7], sp[i + 9]));
+                patientsList.Add(new Patient(int.Parse(sp[i + 1]),sp[i + 3], sp[i + 5], sp[i + 7], sp[i + 9]));
             }
             for (int i = 0; i < patientsList.Count; i++)
             {
@@ -86,13 +71,67 @@ namespace AssistentClient.Views
             }
         }
 
-        private void SendButton_Click(object sender, RoutedEventArgs e)
+        private async void SendButton_Click(object sender, RoutedEventArgs e)
         {
-            NameLabel.Content = "";
-            TajLabel.Content = "";
-            PhoneLabel.Content = "";
-            AddressLabel.Content = "";
-            ComplaintTextBox.Text = "";
+            if (NameLabel.Content.Equals(""))
+            {
+                MessageBox.Show("Patient is not selected!");
+            }
+            else if (ComplaintTextBox.Text.Equals(""))
+            {
+                MessageBox.Show("Complaint is neccesary to send!");
+            }
+            else
+            {
+                try
+                {
+                    int id = 0;
+                    for (int i = 0; i < patientsList.Count; i++)
+                    {
+                        if (ItemListBox.SelectedItem.ToString().Equals(patientsList[i].name))
+                        {
+                            id = patientsList[i].id;
+                        }
+                    }
+                    var complaint = new ActiveComplaint();
+                    complaint.patient_id = id;
+                    complaint.complaint = ComplaintTextBox.Text.ToString();
+
+
+                    var content = new FormUrlEncodedContent(new[]
+                    {
+                new KeyValuePair<string, string>("complaint",complaint.complaint)
+            });
+
+                    var url = "http://localhost:52218/api/treatment/active";
+                    url += "/" + complaint.patient_id.ToString();
+
+                    using var client = new HttpClient();
+                    var response = await client.PostAsync(url, content);
+                    string result = response.Content.ReadAsStringAsync().Result;
+                    Console.WriteLine(result);
+
+                    string[] sp = result.Split(":");
+                    string[] sp2 = sp[1].Split("\"");
+                    if (sp2[1].Equals("The patient is waiting for treatment! You can not pick up new treatment while the older one is not closed."))
+                    {
+                        MessageBox.Show("The patient is waiting for treatment! You can not pick up new treatment while the older one is not closed.");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Complaint is send to doctor!");
+                        NameLabel.Content = "";
+                        TajLabel.Content = "";
+                        PhoneLabel.Content = "";
+                        AddressLabel.Content = "";
+                        ComplaintTextBox.Text = "";
+                    }
+                }
+                catch (Exceptions.InvalidInputException ex)
+                {
+                    MessageBox.Show(ex.message);
+                }
+            }
         }
 
         private void SearchIDButton_Click(object sender, RoutedEventArgs e)
