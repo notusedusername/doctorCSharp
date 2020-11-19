@@ -1,5 +1,7 @@
-﻿using System;
+﻿using AssistentClient.Models;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,25 +10,20 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Net.Http;
-using Newtonsoft.Json;
-using AssistentClient.Models;
 
 namespace AssistentClient.Views
 {
     /// <summary>
-    /// Interaction logic for HomeView.xaml
+    /// Interaction logic for RegisterWindow.xaml
     /// </summary>
-    public partial class HomeView : UserControl
+    public partial class RegisterWindow : Window
     {
-        public HomeView()
+        public RegisterWindow()
         {
             InitializeComponent();
         }
-
-        private async void RegisterButton_Click(object sender, RoutedEventArgs e) 
+        private async void RegisterButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -71,6 +68,11 @@ namespace AssistentClient.Views
                     AddressTextBox.Text = "";
                     TajTextBox.Text = "";
                 }
+                MainWindow m = new MainWindow();
+                m.Top = this.Top;
+                m.Left = this.Left;
+                m.Show();
+                this.Close();
             }
             catch (Exceptions.InvalidInputException ex)
             {
@@ -78,5 +80,13 @@ namespace AssistentClient.Views
             }
         }
 
-}
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow m = new MainWindow();
+            m.Top = this.Top;
+            m.Left = this.Left;
+            m.Show();
+            this.Close();
+        }
+    }
 }

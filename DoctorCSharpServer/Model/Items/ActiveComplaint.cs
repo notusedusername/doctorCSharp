@@ -10,7 +10,7 @@ namespace DoctorCSharpServer.Model.Items
         public int id { get; set; }
         public int patient_id { get; set; }
 
-        public string patient_name;
+        public string patient_name { get; set; }
 
         public string arrival { get; set; }
         public string complaint { get; set; }

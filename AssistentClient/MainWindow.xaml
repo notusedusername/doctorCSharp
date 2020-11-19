@@ -3,42 +3,27 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AssistentClient"
-        xmlns:viewmodels="clr-namespace:AssistentClient.ViewModels"
-        xmlns:views="clr-namespace:AssistentClient.Views"
+        xmlns:local="clr-namespace:AssistentClient.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Window.Resources>
-        <DataTemplate x:Name="changeViewTemplate" DataType="{x:Type viewmodels:ChangeViewModel}">
-            <views:ChangeView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate x:Name="homeViewTemplate" DataType="{x:Type viewmodels:HomeViewModel}">
-            <views:HomeView DataContext="{Binding}"/>
-        </DataTemplate>
-    </Window.Resources>
-    <Grid Background="GreenYellow">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80*"/>
-            <ColumnDefinition Width="64*"/>
-            <ColumnDefinition Width="66*"/>
-            <ColumnDefinition Width="145*"/>
-            <ColumnDefinition Width="45*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <DockPanel Background="DarkGreen" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5">
-            <StackPanel>
-                <Button Background="Green" Foreground="White" FontSize="32" Content="Home" Click="HomeView_Clicked" Height="50"/>
-                <Button FontSize="26" Background="DarkRed" Foreground="White" Content="Change Data" Click="ChangeView_Clicked" Height="50"/>
-            </StackPanel>
-        </DockPanel>
-        
+        Title="Glorious Assistent Client v1.0" Height="450" Width="800" ResizeMode="NoResize">
+    <Grid>
+        <TextBox x:Name="filterTextBox" HorizontalAlignment="Left" Margin="32,32,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="200"/>
+        <Button Background="LightGreen" Foreground="White" Content="Search" HorizontalAlignment="Left" Margin="252,31,0,0" VerticalAlignment="Top" Click="SearchButton_Click" Width="63"/>
+        <Button Background="Blue" Foreground="White" Click="AddButton_Click" Content="Add" HorizontalAlignment="Left" Margin="521,31,0,0" VerticalAlignment="Top" Width="55"/>
+        <DataGrid SelectionChanged="dataGrid_SelectionChanged"  IsReadOnly="True" AutoGenerateColumns="False" x:Name="dataGrid" Margin="32,74,224,64" ItemsSource="{Binding patientsList}">
+            <DataGrid.Columns >
+                <DataGridTextColumn Header="Name" Width="160" Binding="{Binding name}"/>
+                <DataGridTextColumn Header="TAJ" Width="100"  Binding="{Binding taj}"/>
+                <DataGridTextColumn Header="Address" Width="160"  Binding="{Binding address}"/>
+                <DataGridTextColumn Header="Phone" Width="100"  Binding="{Binding phone}"/>
+            </DataGrid.Columns>
 
-        <ContentControl Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="5" Content="{Binding}"/>
-        </Grid>
+        </DataGrid>
+        <TextBox x:Name="complaintTextBox"  HorizontalAlignment="Left" Margin="601,74,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="170" Height="263"/>
+        <Button Click="ComplaintButton_Click" Background="LightGreen" Foreground="White" Content="Pick up complaint" HorizontalAlignment="Left" Margin="601,350,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.161,-0.699" Width="170"/>
+        <Label Content="Complaint" HorizontalAlignment="Left" Margin="601,48,0,0" VerticalAlignment="Top" Width="85"/>
+        <Button Background="LightGreen" Foreground="White" Content="Search All" HorizontalAlignment="Left" Margin="337,31,0,0" VerticalAlignment="Top" Click="SearchAllButton_Click" Width="63"/>
+
+
+    </Grid>
 </Window>
