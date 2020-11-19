@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoctorClient", "DoctorClien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssistentClient", "AssistentClient\AssistentClient.csproj", "{4001BD11-AE9C-4E46-9ADF-9F925B93B0A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Test", "Server.Test\Server.Test.csproj", "{464A344A-539F-4492-8372-1CB9E0185D4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.Test", "Server.Test\Server.Test.csproj", "{464A344A-539F-4492-8372-1CB9E0185D4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons", "Commons\Commons.csproj", "{BA4D9317-39AE-4DAE-A850-7A2749DA72CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{464A344A-539F-4492-8372-1CB9E0185D4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{464A344A-539F-4492-8372-1CB9E0185D4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{464A344A-539F-4492-8372-1CB9E0185D4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA4D9317-39AE-4DAE-A850-7A2749DA72CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA4D9317-39AE-4DAE-A850-7A2749DA72CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA4D9317-39AE-4DAE-A850-7A2749DA72CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA4D9317-39AE-4DAE-A850-7A2749DA72CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DoctorCSharpServer.Model.Items
+namespace DoctorCSharp.Model.Items
 {
     public class Patient
     {

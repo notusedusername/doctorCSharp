@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DoctorCSharpServer.Model.Items;
 using System.Data.SqlClient;
 using DoctorCSharpServer.Controllers.Exceptions;
+using DoctorCSharp.Model.Items;
 
 namespace DoctorCSharpServer.Controllers.Manipulators
 {

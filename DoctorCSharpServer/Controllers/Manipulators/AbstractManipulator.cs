@@ -1,4 +1,6 @@
-﻿using DoctorCSharpServer.Model;
+﻿
+using DoctorCSharp.Model.Items;
+using DoctorCSharpServer.Model;
 using DoctorCSharpServer.Model.Items;
 using System;
 using System.Collections.Generic;
