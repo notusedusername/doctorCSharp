@@ -1,4 +1,5 @@
-﻿using DoctorCSharpServer.Controllers.Exceptions;
+﻿using DoctorCSharp.Model.Items;
+using DoctorCSharpServer.Controllers.Exceptions;
 using DoctorCSharpServer.Model.Items;
 using System;
 using System.Collections.Generic;
