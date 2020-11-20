@@ -24,5 +24,9 @@ namespace DoctorCSharp.Model.Items
             this.arrival = arrival;
             this.complaint = complaint;
         }
+
+        public ActiveComplaint()
+        {
+        }
     }
 }

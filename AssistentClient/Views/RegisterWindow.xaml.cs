@@ -1,4 +1,6 @@
-﻿using AssistentClient.Models;
+﻿using Commons.Items;
+using DoctorCSharp.Model.Items;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -33,12 +35,6 @@ namespace AssistentClient.Views
                 patient.taj = TajTextBox.Text;
                 patient.address = AddressTextBox.Text;
 
-                patient.validateEmpty();
-                patient.validateName();
-                patient.validateTAJ();
-                patient.validateAddress();
-                patient.validatePhone();
-
                 var content = new FormUrlEncodedContent(new[]
                 {
                 new KeyValuePair<string, string>("name", patient.name),
@@ -53,12 +49,12 @@ namespace AssistentClient.Views
                 var response = await client.PostAsync(url, content);
 
                 string result = response.Content.ReadAsStringAsync().Result;
-                Console.WriteLine(result);
-                string[] sp = result.Split(":");
-                string[] sp2 = sp[1].Split("\"");
-                if (sp2[1].Equals("There is already a patient with this TAJ number!"))
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("There is already a patient with this TAJ number!");
+                    jsonError err = new jsonError();
+                    err = JsonConvert.DeserializeObject<jsonError>(result);
+                    MessageBox.Show(err.message);
                 }
                 else
                 {
@@ -67,12 +63,13 @@ namespace AssistentClient.Views
                     PhoneTextBox.Text = "";
                     AddressTextBox.Text = "";
                     TajTextBox.Text = "";
+
+                    MainWindow m = new MainWindow();
+                    m.Top = this.Top;
+                    m.Left = this.Left;
+                    m.Show();
+                    this.Close();
                 }
-                MainWindow m = new MainWindow();
-                m.Top = this.Top;
-                m.Left = this.Left;
-                m.Show();
-                this.Close();
             }
             catch (Exceptions.InvalidInputException ex)
             {
