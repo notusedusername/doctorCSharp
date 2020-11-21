@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DoctorCSharp.Model.Items;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -10,7 +11,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using DoctorClient.Models;
 
 namespace DoctorClient.Views
 {
@@ -26,10 +26,10 @@ namespace DoctorClient.Views
 
         private async void ApplyButton_Click(object sender, RoutedEventArgs e)
         {
-            try
+            /*try
             {
                 var activeComplaint = new ActiveComplaint();
-                activeComplaint.diagnosis = DiagnosticTextBox.Text;
+               activeComplaint.diagnosis = DiagnosticTextBox.Text;
 
                 var content = new FormUrlEncodedContent(new[]
                 {
@@ -57,7 +57,7 @@ namespace DoctorClient.Views
             m.Top = this.Top;
             m.Left = this.Left;
             m.Show();
-            this.Close();
+            this.Close();*/
         }
     }
 }
