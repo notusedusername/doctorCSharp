@@ -11,22 +11,82 @@
 
     <Grid Background="White">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <DataGrid SelectedItem="{Binding selectedComplaint}" ItemsSource="{Binding patients}" AutoGenerateColumns="True" Background="Transparent" FontSize="18" Foreground="Black" BorderThickness="1" BorderBrush="White" Margin="50,30,99,53" Grid.ColumnSpan="2" Grid.RowSpan="6"/>
-        <Button Background="LightGreen" BorderBrush="White" BorderThickness="2" FontSize="18" Command="{Binding SelectPatientCommand}"  Content="Select"   Height="39" Width="65"  Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
-        <Button  Background="LightBlue" BorderBrush="White" BorderThickness="2" FontSize="18" Command="{Binding RefreshWaitingPatientsCommand}"  Content="Refresh"   Height="39" Width="65"  Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
 
+        <Label Content="Please select the next patient!"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Grid.Column="1"
+                   Grid.Row="0"
+                   Margin="0 10 0 0"/>
+        <DataGrid SelectedItem="{Binding selectedComplaint}"
+                  ItemsSource="{Binding patients}"
+                  ColumnWidth="*"
+                  AutoGenerateColumns="False"
+                  CanUserResizeColumns="True"
+                  SelectionMode="Single"
+                  Background="Transparent"
+                  FontSize="18"
+                  Foreground="Black"
+                  BorderThickness="1"
+                  BorderBrush="Black"
+                  Grid.Row="1"
+                  IsReadOnly="True"
+                  Grid.Column="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" 
+                                    Binding="{Binding patient_name}"/>
+                <DataGridTextColumn Header="Complaint"
+                                    Binding="{Binding complaint}"/>
+                <DataGridTextColumn Header="Arrival"
+                                    Binding="{Binding arrival}"/>
+            </DataGrid.Columns>
+        </DataGrid>
 
+        <Grid Grid.Row="1" 
+              Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="10*"/>
+            </Grid.RowDefinitions>
+            <Label Content="Complaint:" 
+                   Grid.Row="0"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Margin="10 0 0 0"/>
+            <Border Grid.Row="1"
+                    BorderBrush="Black"
+                    Margin="8 0 0 0"
+                    BorderThickness="1">
+                <TextBlock Text="{Binding selectedComplaint.complaint}" 
+                       FontSize="16"
+                        Margin="5"/>
+            </Border>
+        </Grid>
+        
+        <Button Background="Green"
+                Command="{Binding SelectPatientCommand}"
+                Content="Select ▷"
+                Grid.Column="2"
+                Grid.Row="4"
+                Margin="7 0 0 0"
+                Width="Auto"
+                />
+        <Button  Background="MediumBlue"
+                 Command="{Binding RefreshWaitingPatientsCommand}"
+                 Content="Refresh ⟲"
+                 Width="Auto"
+                 Margin="0 5 0 5"
+                 Grid.Column="1"
+                 Grid.Row="2"/>
     </Grid>
 </UserControl>

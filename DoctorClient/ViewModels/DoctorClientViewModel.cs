@@ -35,7 +35,20 @@ namespace DoctorClient.ViewModels
                 OnPropertyChanged("currentView");
             }
         }
-        public ActiveComplaint selectedComplaint { get; set; }
+
+        private ActiveComplaint _selectedComplaint;
+        public ActiveComplaint selectedComplaint 
+        {
+            get
+            {
+                return _selectedComplaint;
+            }
+            set
+            {
+                _selectedComplaint = value;
+                OnPropertyChanged("selectedComplaint");
+            }
+        }
 
         private Patient _patient;
         public Patient selectedPatientData 
@@ -50,6 +63,7 @@ namespace DoctorClient.ViewModels
                 OnPropertyChanged("selectedPatientData");
             }
         }
+
 
         public ICommand SelectPatientCommand { get; }
         
@@ -119,17 +133,17 @@ namespace DoctorClient.ViewModels
 
         private void PostDiagnosis()
         {
-            MessageBox.Show("asd");
+            MessageBox.Show("Diagnosis");
         }
 
         private void UpdatePatient()
         {
-            MessageBox.Show("asd");
+            MessageBox.Show("Update");
         }
 
         private void DeletePatient()
         {
-            MessageBox.Show("asd");
+            MessageBox.Show("Delete");
         }
 
         private void SwitchView()
