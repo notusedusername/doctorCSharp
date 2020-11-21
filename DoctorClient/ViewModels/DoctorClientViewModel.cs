@@ -21,6 +21,7 @@ using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using Newtonsoft.Json;
 using Commons.Items;
+using DoctorClient.Models;
 
 namespace DoctorClient.ViewModels
 {
@@ -28,6 +29,10 @@ namespace DoctorClient.ViewModels
     {
         static readonly HttpClient client = new HttpClient();
 
+        public static WaitingPatientList patientListView = new WaitingPatientList();
+
+        public static DiagnosisView diagnosisView = new DiagnosisView();
+        public NotifyView currentView { get; set; }
         public ActiveComplaint selectedComplaint { get; set; }
 
         public Patient selectedPatientData { get; set; }
@@ -46,6 +51,8 @@ namespace DoctorClient.ViewModels
 
         public DoctorClientViewModel()
         {
+            currentView = NotifyView.getInstance();
+            currentView.ShownView = patientListView;
             patients = new ObservableCollection<ActiveComplaint>();
             SelectPatientCommand = new DelegateCommand(SelectPatient);
             PostDiagnosisCommand = new DelegateCommand(PostDiagnosis);
@@ -81,7 +88,7 @@ namespace DoctorClient.ViewModels
 
         private void SelectPatient()
         {
-            
+            currentView.ShownView = diagnosisView;
         }
 
         private void PostDiagnosis()
