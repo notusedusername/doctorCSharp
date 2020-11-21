@@ -11,6 +11,6 @@
         <viewmodels:DoctorClientViewModel />
     </Window.DataContext>
     <Grid>
-        <ContentControl Content="{Binding currentView.View}"/>
+        <ContentControl Content="{Binding currentView.ShownView}"/>
     </Grid>
 </Window>

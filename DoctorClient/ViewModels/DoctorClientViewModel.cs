@@ -47,6 +47,8 @@ namespace DoctorClient.ViewModels
 
         public ICommand DeletePatientAllDataCommand { get; }
 
+        public ICommand SwitchViewCommand { get; }
+
         public ObservableCollection<ActiveComplaint> patients { get; }
 
         public DoctorClientViewModel()
@@ -59,6 +61,7 @@ namespace DoctorClient.ViewModels
             UpdatePatientDataCommand = new DelegateCommand(UpdatePatient);
             DeletePatientAllDataCommand = new DelegateCommand(DeletePatient);
             RefreshWaitingPatientsCommand = new DelegateCommand(RefreshWaitingPatientList);
+            SwitchViewCommand = new DelegateCommand(SwitchView);
             RefreshWaitingPatientList();
         }
 
@@ -88,7 +91,16 @@ namespace DoctorClient.ViewModels
 
         private void SelectPatient()
         {
-            currentView.ShownView = diagnosisView;
+            if(selectedComplaint != null) 
+            {
+                GetPatientData(selectedComplaint.patient_id);
+                SwitchView();
+            }
+            else
+            {
+                MessageBox.Show("Please select a patient from the list!", "No patient selected", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            
         }
 
         private void PostDiagnosis()
@@ -104,6 +116,43 @@ namespace DoctorClient.ViewModels
         private void DeletePatient()
         {
             MessageBox.Show("asd");
+        }
+
+        private void SwitchView()
+        {
+            if(currentView.ShownView == diagnosisView)
+            {
+                currentView.ShownView = patientListView;
+            }
+            else
+            {
+                currentView.ShownView = diagnosisView;
+            }
+        }
+
+        private async void GetPatientData(int id)
+        {
+            HttpResponseMessage response;
+            try
+            {
+                response = await client.GetAsync("http://localhost:52218/api/patient/" + id);
+            }
+            catch (Exception e)
+            {
+                handleHttpExceptions(e);
+                return;
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                selectedPatientData = JsonConvert.DeserializeObject<Patient>(responseBody);
+                MessageBox.Show(selectedPatientData.taj);
+            }
+            else
+            {
+                ParseAndShowErrorResponseFromServer(response);
+            }
         }
 
         private void handleHttpExceptions(Exception e)
