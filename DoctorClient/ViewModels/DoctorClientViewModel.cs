@@ -1,41 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using DoctorClient;
-using DoctorClient.ViewModels;
 using DoctorClient.Views;
-using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using DoctorCSharp.Model.Items;
 using System.Collections.ObjectModel;
 using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using Newtonsoft.Json;
 using Commons.Items;
-using DoctorClient.Models;
+using System.ComponentModel;
+using System.Windows.Controls;
 
 namespace DoctorClient.ViewModels
 {
-    class DoctorClientViewModel
+    class DoctorClientViewModel : INotifyPropertyChanged
     {
         static readonly HttpClient client = new HttpClient();
 
         public static WaitingPatientList patientListView = new WaitingPatientList();
 
         public static DiagnosisView diagnosisView = new DiagnosisView();
-        public NotifyView currentView { get; set; }
+        
+        private UserControl _currentView;
+        public UserControl currentView
+        {
+            get
+            {
+                return _currentView;
+            }
+            set
+            {
+                _currentView = value;
+                OnPropertyChanged("currentView");
+            }
+        }
         public ActiveComplaint selectedComplaint { get; set; }
 
-        public Patient selectedPatientData { get; set; }
+        private Patient _patient;
+        public Patient selectedPatientData 
+        {
+            get
+            {
+                return _patient;
+            }
+            set 
+            {
+                _patient = value;
+                OnPropertyChanged("selectedPatientData");
+            }
+        }
 
         public ICommand SelectPatientCommand { get; }
         
@@ -53,8 +67,8 @@ namespace DoctorClient.ViewModels
 
         public DoctorClientViewModel()
         {
-            currentView = NotifyView.getInstance();
-            currentView.ShownView = patientListView;
+            
+            currentView = patientListView;
             patients = new ObservableCollection<ActiveComplaint>();
             SelectPatientCommand = new DelegateCommand(SelectPatient);
             PostDiagnosisCommand = new DelegateCommand(PostDiagnosis);
@@ -120,13 +134,14 @@ namespace DoctorClient.ViewModels
 
         private void SwitchView()
         {
-            if(currentView.ShownView == diagnosisView)
+            if(currentView == diagnosisView)
             {
-                currentView.ShownView = patientListView;
+                selectedComplaint = null;
+                currentView = patientListView;
             }
             else
             {
-                currentView.ShownView = diagnosisView;
+                currentView = diagnosisView;
             }
         }
 
@@ -147,7 +162,6 @@ namespace DoctorClient.ViewModels
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 selectedPatientData = JsonConvert.DeserializeObject<Patient>(responseBody);
-                MessageBox.Show(selectedPatientData.taj);
             }
             else
             {
@@ -193,106 +207,15 @@ namespace DoctorClient.ViewModels
                 MessageBox.Show("Something went wrong!", "The server is confused ...", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        /*
 
-        public async void getDataComplaint()
-        {
-            HttpResponseMessage response = await client.GetAsync("http://localhost:52218/api/treatment/active");
-            response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
-            string[] sp = responseBody.ToString().Split(new string[] { "[", "]", "{", "}", ",", ":", "\"" }, StringSplitOptions.RemoveEmptyEntries);
-            string[] sp2 = responseBody.ToString().Split(new string[] { "\"" }, StringSplitOptions.RemoveEmptyEntries);
-            int j = 0;
-            for (int i = 0; i < sp.Length; i += 10)
-            {
-                ActiveComplaint ac = new ActiveComplaint();
-                ac.id = int.Parse(sp[i + 1]);
-                ac.patient_id = int.Parse(sp[i + 3]);
-                ac.arrival = DateTime.Parse(sp2[j + 7]);
-                ac.complaint = sp[i + 9].ToString();
-                activeComplaints.Add(ac);
-                j += 12;
-            }
-            activeComplaints = activeComplaints.OrderBy(x => x.arrival).ToList();
-            getDataPatient();
-        }
-        public async void getDataPatient()
-        {
-            HttpResponseMessage response = await client.GetAsync("http://localhost:52218/api/patient");
-            response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
-            string[] sp = responseBody.ToString().Split(new string[] { "[", "]", "{", "}", ",", ":", "\"" }, StringSplitOptions.RemoveEmptyEntries);
+        public event PropertyChangedEventHandler PropertyChanged;
 
-            for (int i = 0; i < sp.Length; i += 10)
-            {
-                patientsDatas.Add(new Patient(int.Parse(sp[i + 1]), sp[i + 3], sp[i + 5], sp[i + 7], sp[i + 9]));
-            }
-            getData();
-        }
-        public void getData()
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            for (int i = 0; i < patientsDatas.Count; i++)
+            if (PropertyChanged != null)
             {
-                for (int j = 0; j < activeComplaints.Count; j++)
-                {
-                    if (patientsDatas[i].id == activeComplaints[j].patient_id)
-                    {
-                        patients.Add(new Patient(patientsDatas[i].id, patientsDatas[i].name, patientsDatas[i].taj, patientsDatas[i].address, patientsDatas[i].phone));
-                    }
-                }
-            }
-            for (int i = 0; i < patients.Count; i++)
-            {
-                string p = patients[i].name + " | " + patients[i].id;
-                patientstolistbox.Add(new Patient(p));
-            }
-            bindListBox();
-        }
-        
-        private void ItemListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            for (int i = 0; i < patients.Count; i++)
-            {
-                if (ItemListBox.SelectedItem.ToString().Equals(patientstolistbox[i].name))
-                {
-                    name = patients[i].name.ToString();
-                    taj = patients[i].taj.ToString();
-                    phone = patients[i].phone.ToString();
-                    address = patients[i].address.ToString();
-                    id = patients[i].id;
-                }
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            if (name.Equals(""))
-            {
-                MessageBox.Show("Select an Item!");
-            }
-            else
-            {
-                ModifyView m = new ModifyView();
-
-                for (int i = 0; i < activeComplaints.Count; i++)
-                {
-                    if (activeComplaints[i].id == id)
-                    {
-                        m.ComplaintLabel.Content = activeComplaints[i].complaint;
-                    }
-                }
-
-                m.Top = this.Top;
-                m.Left = this.Left;
-                m.NameLabel.Content = name;
-                m.AddressLabel.Content = address;
-                m.TajLabel.Content = taj;
-                m.PhoneLabel.Content = phone;
-                m.IDLabel.Content = id;
-                m.Show();
-                this.Close();
-            }
-       
-        }*/
     }
 }
