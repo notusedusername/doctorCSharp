@@ -1,31 +1,39 @@
 # doctorCSharp
 
-# Orvos - asszisztens
-> Egy orvosi rendelőben működő kliens - szerver alkalmazás implementálása.
+#### C# Web API with 2 WPF client application.
 
-## Asszisztens kliens - .NET WPF asztali alkalmazás
-> A asszisztens pultján működik.
-- #### Az érkező betegeket tudja rögzíteni
-    - Név
-        - Validáció
-        - UNIT teszt
-    - Lakcím
-    - Tajszám `Formátum: 000 000 000`
-        - Validáció
-        - UNIT teszt
-    - Panasz rövid leírása
+## DoctorClient
 
-## Orvos kliens - .NET WPF asztali alkalmazás
-> A orvos irodájában működik.
-- #### Látja a felvett betegek listáját
-    - Időrendi sorrendben rendezve
-    - Ki tud választani egy beteget
-        - Látja az adatait
-        - Tudja módosítani
-            - Diagnózis felvétele
-        - Tudja törölni
+Select the next patient, and modify his/her profile, check the complaint and set up a diagnosis. The list is ordered by arrival.
+If there are no patients in the waiting room currently, then the application will re-check it in every 5 seconds.
+If a patient wants to visit another doctor from now, then you can delete all of his/her data with a single click!
+(Well with 2, because you have to confirm this risky action.)
 
-## Szerver - .NET WEB API alkalmazás (önálló konzol alkalmazás)
-- #### Tárolja és szolgáltatja a bevitt adatokat
-    - Adatok tárolása: JSON, XML vagy adatbázis
-    - Indításkor betölti a korábbi adatokat
+### List of the waiting patients
+
+[DoctorClient](./img/DoctorClient_list.png)
+
+### Profile and diagnosis of the examined patient
+
+[DoctorClient](./img/DoctorClient_diagnosis.png)
+
+----
+
+## AssistantClient
+
+Picks up patients
+
+-----
+
+[Specification](https://github.com/arpadracz/ni2020osz/blob/master/Beadando_feladatok/KliensSzerver_Orvos.md)
+
+[REST API](https://documenter.getpostman.com/view/9456191/TVev55CK)
+
+[Trello](https://trello.com/b/WVdJnBiK/doctor-c)
+
+-------
+
+| Developers|
+|------|
+| Zsolt Varga|
+| Norbert Tóth|
