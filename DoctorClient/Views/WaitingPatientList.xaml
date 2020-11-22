@@ -22,7 +22,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Please select the next patient!"
+        <Label Content="{Binding HeaderMessage}"
                    FontSize="16"
                    FontWeight="Bold"
                    Grid.Column="1"

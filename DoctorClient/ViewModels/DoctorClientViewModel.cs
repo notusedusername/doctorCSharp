@@ -11,6 +11,9 @@ using Newtonsoft.Json;
 using Commons.Items;
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Threading;
+using DoctorClient.Model;
+using System.Threading.Tasks;
 
 namespace DoctorClient.ViewModels
 {
@@ -18,6 +21,24 @@ namespace DoctorClient.ViewModels
     {
         static readonly HttpClient client = new HttpClient();
 
+        private string _headerMessage;
+
+        public string HeaderMessage
+        {
+            get
+            {
+                return _headerMessage;
+            }
+            set
+            {
+                if(_headerMessage != value)
+                {
+                    _headerMessage = value;
+                    OnPropertyChanged("HeaderMessage");
+                }
+            }
+        }
+        
         public static WaitingPatientList patientListView = new WaitingPatientList();
 
         public static DiagnosisView diagnosisView = new DiagnosisView();
@@ -95,6 +116,7 @@ namespace DoctorClient.ViewModels
         public DoctorClientViewModel()
         {
             currentView = patientListView;
+            HeaderMessage = "Loading waiting patients...";
             patients = new ObservableCollection<ActiveComplaint>();
             SelectPatientCommand = new DelegateCommand(SelectPatient);
             PostDiagnosisCommand = new DelegateCommand(PutDiagnosis);
@@ -122,6 +144,16 @@ namespace DoctorClient.ViewModels
                 string responseBody = await response.Content.ReadAsStringAsync();
                 patients.Clear();
                 JsonConvert.DeserializeObject<List<ActiveComplaint>>(responseBody).ForEach((item) => patients.Add(item));
+                if(patients.Count == 0)
+                {
+                    HeaderMessage = HeaderMessages.NO_PATIENT;
+                    await Task.Delay(5000);
+                    RefreshWaitingPatientList();
+                }
+                else
+                {
+                    HeaderMessage = HeaderMessages.SELECT_PATIENT;
+                }
             }
             else
             {
@@ -174,7 +206,7 @@ namespace DoctorClient.ViewModels
 
         private async void UpdatePatient()
         {
-            if (isConfirmed("This action will override the patient data, are you sure?", "Override patient data"))
+            if (isConfirmed("This action will override the patient data, are you sure?", "Override patient data", MessageBoxImage.Question))
             {
                 HttpResponseMessage response;
                 HttpContent content = new FormUrlEncodedContent(new[] {
@@ -208,9 +240,32 @@ namespace DoctorClient.ViewModels
         }
 
 
-        private void DeletePatient()
+        private async void DeletePatient()
         {
-            MessageBox.Show("Delete");
+            if (isConfirmed("This action will delete ALL patient data (including the threatments). This action can not be undone. Are you sure?", "Delete patient", MessageBoxImage.Warning))
+            {
+                HttpResponseMessage response;
+                try
+                {
+                    response = await client.DeleteAsync("http://localhost:52218/api/patient/" + selectedPatientData.id);
+                }
+                catch (Exception e)
+                {
+                    handleHttpExceptions(e);
+                    return;
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    patients.Clear();
+                    MessageBox.Show(JsonConvert.DeserializeObject<jsonError>(responseBody).message, "Delete patient", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    ParseAndShowErrorResponseFromServer(response);
+                }
+            }
         }
 
         private void SwitchView()
@@ -249,12 +304,13 @@ namespace DoctorClient.ViewModels
             else
             {
                 ParseAndShowErrorResponseFromServer(response);
+                SwitchView();
             }
         }
 
-        private bool isConfirmed(string message, string title)
+        private bool isConfirmed(string message, string title, MessageBoxImage image)
         {
-            return MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+            return MessageBox.Show(message, title, MessageBoxButton.YesNo, image) == MessageBoxResult.Yes;
         }
 
         private void handleHttpExceptions(Exception e)
@@ -274,9 +330,16 @@ namespace DoctorClient.ViewModels
 
         private async void ParseAndShowErrorResponseFromServer(HttpResponseMessage response)
         {
-            string responseBody = await response.Content.ReadAsStringAsync();
-            jsonError jsonError = JsonConvert.DeserializeObject<jsonError>(responseBody);
-            ShowErrorResponseFromServer(response, jsonError);
+            if(response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                MessageBox.Show("Something went wrong!", "The server is confused ...", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                jsonError jsonError = JsonConvert.DeserializeObject<jsonError>(responseBody);
+                ShowErrorResponseFromServer(response, jsonError);
+            }
 
         }
 
@@ -292,7 +355,6 @@ namespace DoctorClient.ViewModels
             }
             else
             {
-                MessageBox.Show("Something went wrong!", "The server is confused ...", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
