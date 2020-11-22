@@ -11,11 +11,11 @@ If a patient wants to visit another doctor from now, then you can delete all of 
 
 ### List of the waiting patients
 
-[DoctorClient](./img/DoctorClient_list.png)
+![DoctorClient](./img/DoctorClient_list.png)
 
 ### Profile and diagnosis of the examined patient
 
-[DoctorClient](./img/DoctorClient_diagnosis.png)
+![DoctorClient](./img/DoctorClient_diagnosis.png)
 
 ----
 
