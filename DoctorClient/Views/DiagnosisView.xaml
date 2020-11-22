@@ -62,7 +62,7 @@
                 <Label Content="Name" 
                        Grid.Column="1" 
                        Grid.Row="1"/>
-                <TextBox Text="{Binding selectedComplaint.patient_name, Mode=TwoWay}"
+                <TextBox Text="{Binding selectedPatientData.name, Mode=TwoWay}"
                          Grid.Row="2"
                          Grid.Column="1"
                          MaxLength="300"

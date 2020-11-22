@@ -97,7 +97,7 @@ namespace DoctorClient.ViewModels
             currentView = patientListView;
             patients = new ObservableCollection<ActiveComplaint>();
             SelectPatientCommand = new DelegateCommand(SelectPatient);
-            PostDiagnosisCommand = new DelegateCommand(PostDiagnosis);
+            PostDiagnosisCommand = new DelegateCommand(PutDiagnosis);
             UpdatePatientDataCommand = new DelegateCommand(UpdatePatient);
             DeletePatientAllDataCommand = new DelegateCommand(DeletePatient);
             RefreshWaitingPatientsCommand = new DelegateCommand(RefreshWaitingPatientList);
@@ -143,7 +143,7 @@ namespace DoctorClient.ViewModels
             
         }
 
-        private async void PostDiagnosis()
+        private async void PutDiagnosis()
         {
             HttpResponseMessage response;
             HttpContent content = new FormUrlEncodedContent(new[] { 
@@ -172,10 +172,41 @@ namespace DoctorClient.ViewModels
             }
         }
 
-        private void UpdatePatient()
+        private async void UpdatePatient()
         {
-            MessageBox.Show("Update");
+            if (isConfirmed("This action will override the patient data, are you sure?", "Override patient data"))
+            {
+                HttpResponseMessage response;
+                HttpContent content = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>("name", selectedPatientData.name),
+                new KeyValuePair<string, string>("address", selectedPatientData.address),
+                new KeyValuePair<string, string>("TAJ_nr", selectedPatientData.taj),
+                new KeyValuePair<string, string>("phone", selectedPatientData.phone),
+            });
+                try
+                {
+                    response = await client.PutAsync("http://localhost:52218/api/patient/" + selectedPatientData.id, content);
+                }
+                catch (Exception e)
+                {
+                    handleHttpExceptions(e);
+                    return;
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    patients.Clear();
+                    MessageBox.Show(JsonConvert.DeserializeObject<jsonError>(responseBody).message, "Update patient", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    ParseAndShowErrorResponseFromServer(response);
+                }
+            }
+            
         }
+
 
         private void DeletePatient()
         {
@@ -221,6 +252,11 @@ namespace DoctorClient.ViewModels
             }
         }
 
+        private bool isConfirmed(string message, string title)
+        {
+            return MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+        }
+
         private void handleHttpExceptions(Exception e)
         {
             if (e is InvalidOperationException || e is ArgumentNullException)
@@ -250,7 +286,7 @@ namespace DoctorClient.ViewModels
             {
                 MessageBox.Show(jsonError.message, "Invalid value", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            else if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 MessageBox.Show("The requested resource can not be found", "Not found", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
