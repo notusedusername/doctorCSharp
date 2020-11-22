@@ -6,7 +6,11 @@
         xmlns:viewmodels="clr-namespace:DoctorClient.ViewModels"
         xmlns:local="clr-namespace:DoctorClient.Views"
         mc:Ignorable="d"
-        Title="Glorious Doctor Client v1.0" WindowState="Maximized" WindowStyle="SingleBorderWindow">
+        Title="Glorious Doctor Client v1.0"
+        Width="1300"
+        Height="720"
+        WindowStyle="SingleBorderWindow"
+        WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <viewmodels:DoctorClientViewModel />
     </Window.DataContext>
