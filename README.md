@@ -4,6 +4,8 @@
 
 ## DoctorClient
 
+[Github Pages](https://notusedusername.github.io/doctorCSharp/)
+
 Select the next patient, and modify his/her profile, check the complaint and set up a diagnosis. The list is ordered by arrival.
 If there are no patients in the waiting room currently, then the application will re-check it in every 5 seconds.
 If a patient wants to visit another doctor from now, then you can delete all of his/her data with a single click!
