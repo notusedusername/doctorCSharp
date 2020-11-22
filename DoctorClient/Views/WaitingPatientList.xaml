@@ -70,7 +70,8 @@
                    Grid.Row="0"
                    FontSize="20"
                    FontWeight="Bold"
-                   Margin="10 0 0 0"/>
+                   Margin="10 0 0 0"
+                   VerticalAlignment="Top"/>
             <Border Grid.Row="1"
                     BorderBrush="Black"
                     Margin="8 0 0 0"
@@ -86,8 +87,8 @@
                 </ScrollViewer>
             </Border>
         </Grid>
-        
-        <Button Background="Green"
+
+        <Button Background="#009933"
                 Command="{Binding SelectPatientCommand}"
                 Content="Select ▷"
                 Grid.Column="2"
@@ -95,7 +96,7 @@
                 Margin="7 0 0 0"
                 Width="Auto"
                 />
-        <Button  Background="MediumBlue"
+        <Button  Background="#0040ff"
                  Command="{Binding RefreshWaitingPatientsCommand}"
                  Content="Refresh ⟲"
                  Width="Auto"

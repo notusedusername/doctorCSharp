@@ -12,6 +12,7 @@ namespace DoctorCSharpServer.Controllers.Manipulators
 {
     public class DiagnosisCreator : AbstractManipulator
     {
+        private static readonly int DIAGNOSIS_MAX_LENGTH = 4000;
         private string diagnosis { get; }
 
         private int id { get; }
@@ -39,6 +40,10 @@ namespace DoctorCSharpServer.Controllers.Manipulators
             {
                 throw new InvalidInputException("The " + nameof(diagnosis) + " can not be empty!");
             }
+            else if(diagnosis.Length > DIAGNOSIS_MAX_LENGTH)
+            {
+                throw new InvalidInputException("The length of the " + nameof(diagnosis) + " can not be longer than " + DIAGNOSIS_MAX_LENGTH + " characters!");
+            }
         }
 
         protected override string getSqlCommand()
@@ -61,7 +66,7 @@ namespace DoctorCSharpServer.Controllers.Manipulators
 
             }
 
-            return new Response("New treatment successfully saved!");
+            return new Response("Diagnosis successfully saved!");
         }
     }
 }

@@ -63,7 +63,20 @@ namespace DoctorClient.ViewModels
                 OnPropertyChanged("selectedPatientData");
             }
         }
+        private string _diagnosis { get; set; }
 
+        public string Diagnosis
+        {
+            get
+            {
+                return _diagnosis;
+            }
+            set
+            {
+                _diagnosis = value;
+                OnPropertyChanged("Diagnosis");
+            }
+        }
 
         public ICommand SelectPatientCommand { get; }
         
@@ -81,7 +94,6 @@ namespace DoctorClient.ViewModels
 
         public DoctorClientViewModel()
         {
-            
             currentView = patientListView;
             patients = new ObservableCollection<ActiveComplaint>();
             SelectPatientCommand = new DelegateCommand(SelectPatient);
@@ -131,9 +143,33 @@ namespace DoctorClient.ViewModels
             
         }
 
-        private void PostDiagnosis()
+        private async void PostDiagnosis()
         {
-            MessageBox.Show("Diagnosis");
+            HttpResponseMessage response;
+            HttpContent content = new FormUrlEncodedContent(new[] { 
+                new KeyValuePair<string, string>("diagnosis", Diagnosis) 
+            });
+            try
+            {
+                response = await client.PutAsync("http://localhost:52218/api/treatment/active/" + selectedPatientData.id, content);
+            }
+            catch (Exception e)
+            {
+                handleHttpExceptions(e);
+                return;
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                patients.Clear();
+                MessageBox.Show(JsonConvert.DeserializeObject<jsonError>(responseBody).message, "Diagnosis", MessageBoxButton.OK, MessageBoxImage.Information);
+                SwitchView();
+            }
+            else
+            {
+                ParseAndShowErrorResponseFromServer(response);
+            }
         }
 
         private void UpdatePatient()
@@ -151,11 +187,13 @@ namespace DoctorClient.ViewModels
             if(currentView == diagnosisView)
             {
                 selectedComplaint = null;
+                RefreshWaitingPatientList();
                 currentView = patientListView;
             }
             else
             {
                 currentView = diagnosisView;
+                Diagnosis = "";
             }
         }
 
