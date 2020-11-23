@@ -1,41 +1,24 @@
-﻿using DoctorCSharp.Model.Items;
+﻿using AssistentClient.Views;
+using Commons.Items;
+using DoctorCSharp.Model.Items;
+using GalaSoft.MvvmLight.Command;
 using Microsoft.VisualStudio.PlatformUI;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Net.Http;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
-using Commons.Items;
-using System.ComponentModel;
 
 namespace AssistentClient.ViewModels
 {
-    /*
-     * <Grid Height="758" Width="1024" >
-        <TextBox HorizontalAlignment="Left" FontSize="18" Text="{Binding Filter,UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Top" Width="200" Height="30" Margin="32,32,0,0"/>
-        <Button Content="Add" FontSize="18" Command="{Binding AddCommand }"
-                CommandParameter="{Binding Path=., RelativeSource={RelativeSource AncestorType=Window}}"  HorizontalAlignment="Left" Width="100" Height="30" VerticalAlignment="Top" Margin="450,32,0,0"/>
-        <Button FontSize="18" Content="Pick Up Complaint" Command="{Binding SendComplaintCommand}"  HorizontalAlignment="Right" VerticalAlignment="Bottom"  Width="233" Height="29" Margin="0,0,32,67"/>
-        <DataGrid  CanUserResizeColumns="False" CanUserResizeRows="False" IsReadOnly="True" SelectedItem="{Binding selectedPatient}" ItemsSource="{Binding patients}" AutoGenerateColumns="True"  FontSize="18" Foreground="Black" BorderThickness="1"  Margin="32,90,0,0" Width="518"  HorizontalAlignment="Left" VerticalAlignment="Top" Height="601"/>
-
-        <TextBox FontSize="18" HorizontalAlignment="Right" Margin="0,90,32,0" Text="{Binding Complaint}" TextWrapping="Wrap" VerticalAlignment="Top" Width="233" Height="537"/>
-        <Label FontSize="18" Content="Complaint" HorizontalAlignment="Left" Margin="759,32,0,0" VerticalAlignment="Top" Height="40" Width="98"/>
-    </Grid>
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * */
-    class MainWindowViewModel
+    public class AssistentClientViewModel : INotifyPropertyChanged
     {
         static readonly HttpClient client = new HttpClient();
-        public event PropertyChangedEventHandler PropertyChanged;
         public string Complaint { get; set; }
         private string _filter;
         public string Filter
@@ -59,23 +42,61 @@ namespace AssistentClient.ViewModels
         public ICommand AddCommand { get; }
         public ICommand SendComplaintCommand { get; }
         public ICommand Refresh { get; }
+        public ICommand SwitchViewCommand { get; }
         public Patient selectedPatient { get; set; }
         public ObservableCollection<Patient> patients { get; set; }
-        public  MainWindowViewModel(){
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        public AssistentClientViewModel()
+        {
+            currentView = HomeView;
             patients = new ObservableCollection<Patient>();
             AddCommand = new DelegateCommand(AddButton);
             Refresh = new DelegateCommand(FilterChanged);
             SendComplaintCommand = new DelegateCommand(SendButton);
+            this.RegisterCommand = new DelegateCommand(Register);
+            this.BackCommand = new RelayCommand<Window>(this.BackButton);
+            SwitchViewCommand = new DelegateCommand(SwitchView);
             FilterChanged();
         }
-        public void OnPropertyChanged(string propertyName)
+        public static HomeView HomeView = new HomeView();
+        public static RegisterView RegisterView = new RegisterView();
+
+        private UserControl _currentView;
+        public UserControl currentView
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            get
+            {
+                return _currentView;
+            }
+            set
+            {
+                _currentView = value;
+                OnPropertyChanged("currentView");
+            }
+        }
+        private void SwitchView()
+        {
+            if (currentView == RegisterView)
+            {
+                FilterChanged();
+                currentView = HomeView;
+            }
+            else
+            {
+                currentView = RegisterView;
+            }
         }
         private void AddButton()
         {
-            
+            SwitchView();
         }
         private async void SendButton()
         {
@@ -129,7 +150,7 @@ namespace AssistentClient.ViewModels
             HttpResponseMessage response;
             try
             {
-                response = await client.GetAsync("http://localhost:52218/api/patient?filter="+Filter);
+                response = await client.GetAsync("http://localhost:52218/api/patient?filter=" + Filter);
             }
             catch (Exception e)
             {
@@ -186,23 +207,64 @@ namespace AssistentClient.ViewModels
                 MessageBox.Show("Something went wrong!", "The server is confused ...", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        public ICommand RegisterCommand { get; }
+        public ICommand BackCommand { get; }
+        public string Name { get; set; }
+        public string Taj { get; set; }
+        public string Address { get; set; }
+        public string Phone { get; set; }
 
+        private async void Register()
+        {
+            try
+            {
+                var patient = new Patient();
+                patient.name = Name;
+                patient.phone = Phone;
+                patient.taj = Taj;
+                patient.address = Address;
+
+                var content = new FormUrlEncodedContent(new[]
+                {
+                new KeyValuePair<string, string>("name", patient.name),
+                new KeyValuePair<string, string>("taJ_nr",patient.taj),
+                new KeyValuePair<string, string>("address",patient.address),
+                new KeyValuePair<string, string>("phone",patient.phone)
+            });
+
+                var url = "http://localhost:52218/api/patient";
+                using var client = new HttpClient();
+
+                var response = await client.PostAsync(url, content);
+
+                string result = response.Content.ReadAsStringAsync().Result;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    jsonError err = new jsonError();
+                    err = JsonConvert.DeserializeObject<jsonError>(result);
+                    MessageBox.Show(err.message);
+                }
+                else
+                {
+                    MessageBox.Show("New patient succesfully saved!");
+                    Name = "";
+                    Phone = "";
+                    Address = "";
+                    Taj = "";
+                }
+            }
+            catch (Exceptions.InvalidInputException ex)
+            {
+                MessageBox.Show(ex.message);
+            }
+        }
+        private void BackButton(Window window)
+        {
+            SwitchView();
+        }
     }
+
 }
 
-/*
- * 
- * 
- *         <TextBox HorizontalAlignment="Center" Text="{Binding Filter,UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Height="18" Margin="0,37,0,0">
 
-        </TextBox>
-        <Button Content="Add" Command="{Binding AddCommand}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center" Height="20" Width="100"/>
-        <Button Content="Pick Up Complaint" Command="{Binding SendComplaintCommand}" Grid.Column="3" HorizontalAlignment="Center" Grid.Row="7" VerticalAlignment="Top" Width="170" Margin="0,12,0,0" Height="20"/>
-        <DataGrid CanUserResizeColumns="False" CanUserResizeRows="False" IsReadOnly="True" SelectedItem="{Binding selectedPatient}" ItemsSource="{Binding patients}" AutoGenerateColumns="True" Background="Transparent" FontSize="18" Foreground="Black" BorderThickness="1" BorderBrush="White" Grid.ColumnSpan="2" Margin="37,10,2,22" Grid.RowSpan="7" Grid.Row="1">
-        </DataGrid>
-        <Label Content="Complaint" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="46,0,0,0" Width="65"/>
-        <TextBox Grid.Column="3" HorizontalAlignment="Center" Margin="0,22,0,0" Text="{Binding Complaint}" TextWrapping="Wrap" VerticalAlignment="Top" Width="170" Grid.RowSpan="7" Height="238" Grid.Row="1"/>
-        <Button  Background="LightBlue" BorderBrush="White" BorderThickness="2" FontSize="18" Command="{Binding Refresh}"  Content="Refresh"  Grid.Column="1" Margin="99,37,66,140"/>
-
-
-*/

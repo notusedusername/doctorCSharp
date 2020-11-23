@@ -25,6 +25,7 @@ namespace AssistentClient.Views
         {
             InitializeComponent();
         }
+        /*
         private async void RegisterButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -84,6 +85,7 @@ namespace AssistentClient.Views
             m.Left = this.Left;
             m.Show();
             this.Close();
-        }
+        }*/
     }
+        
 }

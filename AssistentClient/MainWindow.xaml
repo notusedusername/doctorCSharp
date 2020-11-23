@@ -1,60 +1,21 @@
 ﻿<Window x:Class="AssistentClient.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AssistentClient.Views"
+        xmlns:viewmodels="clr-namespace:AssistentClient.ViewModels"
+        xmlns:local="clr-namespace:AssistentClient" xmlns:interacitivy="http://schemas.microsoft.com/expression/2010/interactivity" 
         mc:Ignorable="d"
-        Title="Glorious Assistent Client v1.0" Height="450" Width="800" ResizeMode="NoResize">
-    <Grid>
-        <TextBox  x:Name="filterTextBox" TextChanged="filterTextBox_TextChanged" Text="" HorizontalAlignment="Left" Margin="32,33,0,0" VerticalAlignment="Top" Width="200">
-            <TextBox.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-
-                </Style>
-            </TextBox.Resources>
-        </TextBox>
-
-        <Button Background="LightBlue" BorderBrush="DarkBlue" BorderThickness="2" Foreground="White" Click="AddButton_Click" Content="Add" HorizontalAlignment="Left" Margin="486,31,248,0" VerticalAlignment="Top" Width="50">
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-                </Style>
-            </Button.Resources>
-        </Button>
-        <DataGrid  BorderBrush="White"  AllowDrop="False" CanUserResizeColumns="False" CanUserResizeRows="False" EnableRowVirtualization="False" SelectionChanged="dataGrid_SelectionChanged"  IsReadOnly="True" AutoGenerateColumns="False" x:Name="dataGrid" Margin="32,74,248,36" ItemsSource="{Binding patientsList}">
-            <DataGrid.Columns >
-                <DataGridTextColumn Header="Name" Width="160" Binding="{Binding name}"/>
-                <DataGridTextColumn Header="TAJ" Width="100"  Binding="{Binding taj}"/>
-                <DataGridTextColumn Header="Address" Width="130"  Binding="{Binding address}"/>
-                <DataGridTextColumn Header="Phone" Width="100"  Binding="{Binding phone}"/>
-            </DataGrid.Columns>
-            <DataGrid.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-
-                </Style>
-            </DataGrid.Resources>
-
-        </DataGrid>
-        <TextBox x:Name="complaintTextBox" HorizontalAlignment="Left" Margin="601,74,0,40" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="170" Height="263">
-            <TextBox.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-
-                </Style>
-            </TextBox.Resources>
-        </TextBox>
-        <Button BorderBrush="DarkGreen" BorderThickness="2" Click="ComplaintButton_Click" Height="25" Background="LightGreen" Foreground="White" Content="Pick up complaint" HorizontalAlignment="Left" Margin="601,350,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.161,-0.699" Width="170">
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-                </Style>
-            </Button.Resources>
-        </Button>
-        <Label Content="Complaint" FontSize="16" HorizontalAlignment="Left" Margin="601,48,0,0" VerticalAlignment="Top" Width="85"/>
-
-
+        Title="Glorious Assitent Client v1.0"
+        Width="1300"
+        Height="720"
+        WindowStyle="SingleBorderWindow"
+        WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <viewmodels:AssistentClientViewModel />
+    </Window.DataContext>
+    <Grid >
+        <ContentControl Content="{Binding currentView}" />
     </Grid>
 </Window>
