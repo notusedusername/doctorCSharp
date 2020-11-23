@@ -23,8 +23,27 @@ If a patient wants to visit another doctor from now, then you can delete all of 
 
 ## AssistantClient
 
-Picks up patients
+List of patient with basic data.Register new patient and search by name or TAJ.Select the patient and send complaint to doctor.
 
+### List of the waiting patients
+
+![DoctorClient](./img/AssistentClient_list.png)
+
+### Register new patient
+
+![DoctorClient](./img/AssistentClient_register.png)
+
+### List with registered patient
+
+![DoctorClient](./img/AssistentClient_list2.png)
+
+### Filter and select patient
+
+![DoctorClient](./img/AssistentClient_filter_select.png)
+
+### Send the complaint to doctor
+
+![DoctorClient](./img/AssistentClient_filter_send.png)
 -----
 
 [Specification](https://github.com/arpadracz/ni2020osz/blob/master/Beadando_feladatok/KliensSzerver_Orvos.md)
