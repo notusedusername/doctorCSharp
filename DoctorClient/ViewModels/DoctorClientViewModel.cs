@@ -1,36 +1,103 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using DoctorClient;
-using DoctorClient.ViewModels;
 using DoctorClient.Views;
-using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using DoctorCSharp.Model.Items;
 using System.Collections.ObjectModel;
 using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using Newtonsoft.Json;
 using Commons.Items;
+using System.ComponentModel;
+using System.Windows.Controls;
+using System.Threading;
+using DoctorClient.Model;
+using System.Threading.Tasks;
 
 namespace DoctorClient.ViewModels
 {
-    class DoctorClientViewModel
+    class DoctorClientViewModel : INotifyPropertyChanged
     {
         static readonly HttpClient client = new HttpClient();
 
-        public ActiveComplaint selectedComplaint { get; set; }
+        private string _headerMessage;
 
-        public Patient selectedPatientData { get; set; }
+        public string HeaderMessage
+        {
+            get
+            {
+                return _headerMessage;
+            }
+            set
+            {
+                if(_headerMessage != value)
+                {
+                    _headerMessage = value;
+                    OnPropertyChanged("HeaderMessage");
+                }
+            }
+        }
+        
+        public static WaitingPatientList patientListView = new WaitingPatientList();
+
+        public static DiagnosisView diagnosisView = new DiagnosisView();
+        
+        private UserControl _currentView;
+        public UserControl currentView
+        {
+            get
+            {
+                return _currentView;
+            }
+            set
+            {
+                _currentView = value;
+                OnPropertyChanged("currentView");
+            }
+        }
+
+        private ActiveComplaint _selectedComplaint;
+        public ActiveComplaint selectedComplaint 
+        {
+            get
+            {
+                return _selectedComplaint;
+            }
+            set
+            {
+                _selectedComplaint = value;
+                OnPropertyChanged("selectedComplaint");
+            }
+        }
+
+        private Patient _patient;
+        public Patient selectedPatientData 
+        {
+            get
+            {
+                return _patient;
+            }
+            set 
+            {
+                _patient = value;
+                OnPropertyChanged("selectedPatientData");
+            }
+        }
+        private string _diagnosis { get; set; }
+
+        public string Diagnosis
+        {
+            get
+            {
+                return _diagnosis;
+            }
+            set
+            {
+                _diagnosis = value;
+                OnPropertyChanged("Diagnosis");
+            }
+        }
 
         public ICommand SelectPatientCommand { get; }
         
@@ -42,16 +109,21 @@ namespace DoctorClient.ViewModels
 
         public ICommand DeletePatientAllDataCommand { get; }
 
+        public ICommand SwitchViewCommand { get; }
+
         public ObservableCollection<ActiveComplaint> patients { get; }
 
         public DoctorClientViewModel()
         {
+            currentView = patientListView;
+            HeaderMessage = "Loading waiting patients...";
             patients = new ObservableCollection<ActiveComplaint>();
             SelectPatientCommand = new DelegateCommand(SelectPatient);
-            PostDiagnosisCommand = new DelegateCommand(PostDiagnosis);
+            PostDiagnosisCommand = new DelegateCommand(PutDiagnosis);
             UpdatePatientDataCommand = new DelegateCommand(UpdatePatient);
             DeletePatientAllDataCommand = new DelegateCommand(DeletePatient);
             RefreshWaitingPatientsCommand = new DelegateCommand(RefreshWaitingPatientList);
+            SwitchViewCommand = new DelegateCommand(SwitchView);
             RefreshWaitingPatientList();
         }
 
@@ -72,6 +144,16 @@ namespace DoctorClient.ViewModels
                 string responseBody = await response.Content.ReadAsStringAsync();
                 patients.Clear();
                 JsonConvert.DeserializeObject<List<ActiveComplaint>>(responseBody).ForEach((item) => patients.Add(item));
+                if(patients.Count == 0)
+                {
+                    HeaderMessage = HeaderMessages.NO_PATIENT;
+                    await Task.Delay(5000);
+                    RefreshWaitingPatientList();
+                }
+                else
+                {
+                    HeaderMessage = HeaderMessages.SELECT_PATIENT;
+                }
             }
             else
             {
@@ -81,22 +163,154 @@ namespace DoctorClient.ViewModels
 
         private void SelectPatient()
         {
+            if(selectedComplaint != null) 
+            {
+                GetPatientData(selectedComplaint.patient_id);
+                SwitchView();
+            }
+            else
+            {
+                MessageBox.Show("Please select a patient from the list!", "No patient selected", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
             
         }
 
-        private void PostDiagnosis()
+        private async void PutDiagnosis()
         {
-            MessageBox.Show("asd");
+            HttpResponseMessage response;
+            HttpContent content = new FormUrlEncodedContent(new[] { 
+                new KeyValuePair<string, string>("diagnosis", Diagnosis) 
+            });
+            try
+            {
+                response = await client.PutAsync("http://localhost:52218/api/treatment/active/" + selectedPatientData.id, content);
+            }
+            catch (Exception e)
+            {
+                handleHttpExceptions(e);
+                return;
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                patients.Clear();
+                MessageBox.Show(JsonConvert.DeserializeObject<jsonError>(responseBody).message, "Diagnosis", MessageBoxButton.OK, MessageBoxImage.Information);
+                SwitchView();
+            }
+            else
+            {
+                ParseAndShowErrorResponseFromServer(response);
+            }
         }
 
-        private void UpdatePatient()
+        private async void UpdatePatient()
         {
-            MessageBox.Show("asd");
+            if (isConfirmed("This action will override the patient data, are you sure?", "Override patient data", MessageBoxImage.Question))
+            {
+                HttpResponseMessage response;
+                HttpContent content = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>("name", selectedPatientData.name),
+                new KeyValuePair<string, string>("address", selectedPatientData.address),
+                new KeyValuePair<string, string>("TAJ_nr", selectedPatientData.taj),
+                new KeyValuePair<string, string>("phone", selectedPatientData.phone),
+            });
+                try
+                {
+                    response = await client.PutAsync("http://localhost:52218/api/patient/" + selectedPatientData.id, content);
+                }
+                catch (Exception e)
+                {
+                    handleHttpExceptions(e);
+                    return;
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    patients.Clear();
+                    MessageBox.Show(JsonConvert.DeserializeObject<jsonError>(responseBody).message, "Update patient", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    ParseAndShowErrorResponseFromServer(response);
+                }
+            }
+            
         }
 
-        private void DeletePatient()
+
+        private async void DeletePatient()
         {
-            MessageBox.Show("asd");
+            if (isConfirmed("This action will delete ALL patient data (including the threatments). This action can not be undone. Are you sure?", "Delete patient", MessageBoxImage.Warning))
+            {
+                HttpResponseMessage response;
+                try
+                {
+                    response = await client.DeleteAsync("http://localhost:52218/api/patient/" + selectedPatientData.id);
+                }
+                catch (Exception e)
+                {
+                    handleHttpExceptions(e);
+                    return;
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    patients.Clear();
+                    MessageBox.Show(JsonConvert.DeserializeObject<jsonError>(responseBody).message, "Delete patient", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    ParseAndShowErrorResponseFromServer(response);
+                }
+            }
+        }
+
+        private void SwitchView()
+        {
+            if(currentView == diagnosisView)
+            {
+                selectedComplaint = null;
+                RefreshWaitingPatientList();
+                currentView = patientListView;
+            }
+            else
+            {
+                currentView = diagnosisView;
+                Diagnosis = "";
+            }
+        }
+
+        private async void GetPatientData(int id)
+        {
+            HttpResponseMessage response;
+            try
+            {
+                response = await client.GetAsync("http://localhost:52218/api/patient/" + id);
+            }
+            catch (Exception e)
+            {
+                handleHttpExceptions(e);
+                return;
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                selectedPatientData = JsonConvert.DeserializeObject<Patient>(responseBody);
+            }
+            else
+            {
+                ParseAndShowErrorResponseFromServer(response);
+                SwitchView();
+            }
+        }
+
+        private bool isConfirmed(string message, string title, MessageBoxImage image)
+        {
+            return MessageBox.Show(message, title, MessageBoxButton.YesNo, image) == MessageBoxResult.Yes;
         }
 
         private void handleHttpExceptions(Exception e)
@@ -116,9 +330,16 @@ namespace DoctorClient.ViewModels
 
         private async void ParseAndShowErrorResponseFromServer(HttpResponseMessage response)
         {
-            string responseBody = await response.Content.ReadAsStringAsync();
-            jsonError jsonError = JsonConvert.DeserializeObject<jsonError>(responseBody);
-            ShowErrorResponseFromServer(response, jsonError);
+            if(response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                MessageBox.Show("Something went wrong!", "The server is confused ...", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                jsonError jsonError = JsonConvert.DeserializeObject<jsonError>(responseBody);
+                ShowErrorResponseFromServer(response, jsonError);
+            }
 
         }
 
@@ -128,115 +349,23 @@ namespace DoctorClient.ViewModels
             {
                 MessageBox.Show(jsonError.message, "Invalid value", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            else if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 MessageBox.Show("The requested resource can not be found", "Not found", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else
             {
-                MessageBox.Show("Something went wrong!", "The server is confused ...", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-        /*
-
-        public async void getDataComplaint()
-        {
-            HttpResponseMessage response = await client.GetAsync("http://localhost:52218/api/treatment/active");
-            response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
-            string[] sp = responseBody.ToString().Split(new string[] { "[", "]", "{", "}", ",", ":", "\"" }, StringSplitOptions.RemoveEmptyEntries);
-            string[] sp2 = responseBody.ToString().Split(new string[] { "\"" }, StringSplitOptions.RemoveEmptyEntries);
-            int j = 0;
-            for (int i = 0; i < sp.Length; i += 10)
-            {
-                ActiveComplaint ac = new ActiveComplaint();
-                ac.id = int.Parse(sp[i + 1]);
-                ac.patient_id = int.Parse(sp[i + 3]);
-                ac.arrival = DateTime.Parse(sp2[j + 7]);
-                ac.complaint = sp[i + 9].ToString();
-                activeComplaints.Add(ac);
-                j += 12;
-            }
-            activeComplaints = activeComplaints.OrderBy(x => x.arrival).ToList();
-            getDataPatient();
-        }
-        public async void getDataPatient()
-        {
-            HttpResponseMessage response = await client.GetAsync("http://localhost:52218/api/patient");
-            response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
-            string[] sp = responseBody.ToString().Split(new string[] { "[", "]", "{", "}", ",", ":", "\"" }, StringSplitOptions.RemoveEmptyEntries);
-
-            for (int i = 0; i < sp.Length; i += 10)
-            {
-                patientsDatas.Add(new Patient(int.Parse(sp[i + 1]), sp[i + 3], sp[i + 5], sp[i + 7], sp[i + 9]));
-            }
-            getData();
-        }
-        public void getData()
-        {
-            for (int i = 0; i < patientsDatas.Count; i++)
-            {
-                for (int j = 0; j < activeComplaints.Count; j++)
-                {
-                    if (patientsDatas[i].id == activeComplaints[j].patient_id)
-                    {
-                        patients.Add(new Patient(patientsDatas[i].id, patientsDatas[i].name, patientsDatas[i].taj, patientsDatas[i].address, patientsDatas[i].phone));
-                    }
-                }
-            }
-            for (int i = 0; i < patients.Count; i++)
-            {
-                string p = patients[i].name + " | " + patients[i].id;
-                patientstolistbox.Add(new Patient(p));
-            }
-            bindListBox();
-        }
-        
-        private void ItemListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            for (int i = 0; i < patients.Count; i++)
-            {
-                if (ItemListBox.SelectedItem.ToString().Equals(patientstolistbox[i].name))
-                {
-                    name = patients[i].name.ToString();
-                    taj = patients[i].taj.ToString();
-                    phone = patients[i].phone.ToString();
-                    address = patients[i].address.ToString();
-                    id = patients[i].id;
-                }
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            if (name.Equals(""))
+            if (PropertyChanged != null)
             {
-                MessageBox.Show("Select an Item!");
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
-            else
-            {
-                ModifyView m = new ModifyView();
-
-                for (int i = 0; i < activeComplaints.Count; i++)
-                {
-                    if (activeComplaints[i].id == id)
-                    {
-                        m.ComplaintLabel.Content = activeComplaints[i].complaint;
-                    }
-                }
-
-                m.Top = this.Top;
-                m.Left = this.Left;
-                m.NameLabel.Content = name;
-                m.AddressLabel.Content = address;
-                m.TajLabel.Content = taj;
-                m.PhoneLabel.Content = phone;
-                m.IDLabel.Content = id;
-                m.Show();
-                this.Close();
-            }
-       
-        }*/
+        }
     }
 }

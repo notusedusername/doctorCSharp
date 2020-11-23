@@ -11,6 +11,8 @@ namespace DoctorCSharpServer.Controllers.Manipulators
 {
     public class TreatmentCreator : AbstractManipulator
     {
+        private static readonly int COMPLAINT_MAX_LENGTH = 1000;
+
         private string complaint { get; }
 
         private int id { get;  }
@@ -37,6 +39,10 @@ namespace DoctorCSharpServer.Controllers.Manipulators
             if (string.IsNullOrWhiteSpace(complaint))
             {
                 throw new InvalidInputException("The " + nameof(complaint) + " can not be empty!");
+            }
+            else if(complaint.Length > COMPLAINT_MAX_LENGTH)
+            {
+                throw new InvalidInputException("The length of the " + nameof(complaint) + " can not be longer than " + COMPLAINT_MAX_LENGTH + " characters!");
             }
         }
 
