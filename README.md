@@ -43,7 +43,7 @@ List of patient with basic data.Register new patient and search by name or TAJ.S
 
 ### Send the complaint to doctor
 
-![AssistentClient](./img/AssistentClient_filter_send.png)
+![AssistentClient](./img/AssistentClient_send.png)
 -----
 
 [Specification](https://github.com/arpadracz/ni2020osz/blob/master/Beadando_feladatok/KliensSzerver_Orvos.md)
