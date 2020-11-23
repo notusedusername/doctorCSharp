@@ -105,6 +105,7 @@ namespace AssistentClient.ViewModels
         {
             if (currentView == RegisterView)
             {
+                Filter = "";
                 FilterChanged();
                 currentView = HomeView;
             }
@@ -154,14 +155,15 @@ namespace AssistentClient.ViewModels
                     }
                     else
                     {
-                        MessageBox.Show("Complaint is send to doctor!");
+                        MessageBox.Show("Complaint is sent to doctor!");
                         Complaint = "";
+                        FilterChanged();
                         selectedPatient = null;
                     }
                 }
-                catch (Exceptions.InvalidInputException ex)
+                catch (Exception ex)
                 {
-                    MessageBox.Show(ex.message);
+                    handleHttpExceptions(ex);
                 }
             }
         }
@@ -191,8 +193,6 @@ namespace AssistentClient.ViewModels
         }
         private async void Register()
         {
-            try
-            {
                 var patient = new Patient();
                 patient.name = Name;
                 patient.phone = Phone;
@@ -225,11 +225,7 @@ namespace AssistentClient.ViewModels
                     Taj = "";
                     SwitchView();
                 }
-            }
-            catch (Exceptions.InvalidInputException ex)
-            {
-                MessageBox.Show(ex.message);
-            }
+            
         }
         private void BackButton(Window window)
         {
@@ -253,9 +249,16 @@ namespace AssistentClient.ViewModels
 
         private async void ParseAndShowErrorResponseFromServer(HttpResponseMessage response)
         {
-            string responseBody = await response.Content.ReadAsStringAsync();
-            jsonError jsonError = JsonConvert.DeserializeObject<jsonError>(responseBody);
-            ShowErrorResponseFromServer(response, jsonError);
+            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                MessageBox.Show("Something went wrong!", "The server is confused ...", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                jsonError jsonError = JsonConvert.DeserializeObject<jsonError>(responseBody);
+                ShowErrorResponseFromServer(response, jsonError);
+            }
 
         }
 
@@ -265,13 +268,12 @@ namespace AssistentClient.ViewModels
             {
                 MessageBox.Show(jsonError.message, "Invalid value", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 MessageBox.Show("The requested resource can not be found", "Not found", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else
             {
-                MessageBox.Show("Something went wrong!", "The server is confused ...", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
