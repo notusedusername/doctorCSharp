@@ -6,13 +6,13 @@
              xmlns:local="clr-namespace:AssistentClient.Views"
              mc:Ignorable="d" 
              d:DesignHeight="720" d:DesignWidth="1300">
-    <Grid Background="White">
+    <Grid Background="LightBlue">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="70*"/>
-            <ColumnDefinition Width="72*"/>
-            <ColumnDefinition Width="161*"/>
-            <ColumnDefinition Width="52*"/>
-            <ColumnDefinition Width="45*"/>
+            <ColumnDefinition Width="232*"/>
+            <ColumnDefinition Width="292*"/>
+            <ColumnDefinition Width="460*"/>
+            <ColumnDefinition Width="170*"/>
+            <ColumnDefinition Width="140*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -22,56 +22,117 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="5"/>
-        <Label Foreground="Black" Content="Name:" FontSize="24" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="-0.171,0.524" Height="42" Width="78"/>
-        <Label Foreground="Black" Content="TAJ:" FontSize="24" Grid.Column="1" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Height="42" Width="52"/>
-        <Label Foreground="Black" Content="Address:" FontSize="24"  Grid.Column="1" HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Center" Height="42" Width="100"/>
-        <Label Foreground="Black" Content="Phone:" FontSize="24"  Grid.Column="1" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Center" Height="42" Width="82"/>
-        <TextBox Foreground="Black" x:Name="NameTextBox"  Text="{Binding Name}" FontSize="24" Grid.Column="2" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" Width="242" Height="34" >
-            <TextBox.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
+        <ContentControl Grid.Row="0" 
+                        Grid.Column="1" 
+                        Grid.ColumnSpan="4" 
+                        Grid.RowSpan="5"/>
+        
+        <Label Foreground="Black" 
+               FontWeight="Bold" 
+               Content="Name" 
+               FontSize="24" 
+               Grid.Column="1" 
+               HorizontalAlignment="Right" 
+               VerticalAlignment="Center" 
+               RenderTransformOrigin="-0.171,0.524" 
+               Height="42" Width="78"/>
+        
+        <Label Foreground="Black" 
+               FontWeight="Bold" 
+               Content="TAJ" 
+               FontSize="24" 
+               Grid.Column="1" 
+               HorizontalAlignment="Right" 
+               Grid.Row="1" 
+               VerticalAlignment="Center" 
+               Height="42" Width="52"/>
+        
+        <Label Foreground="Black" 
+               FontWeight="Bold"   
+               Content="Address" 
+               FontSize="24"  
+               Grid.Column="1" 
+               HorizontalAlignment="Right" 
+               Grid.Row="2" 
+               VerticalAlignment="Center" 
+               Height="42" Width="100"/>
+        
+        <Label Foreground="Black" 
+               FontWeight="Bold" 
+               Content="Phone" 
+               FontSize="24"  
+               Grid.Column="1" 
+               HorizontalAlignment="Right" 
+               Grid.Row="3" 
+               VerticalAlignment="Center" 
+               Height="42" Width="82"/>
+        
+        <TextBox Foreground="Black" 
+                 BorderBrush="Black" 
+                 x:Name="NameTextBox"  
+                 Text="{Binding Name}" 
+                 FontSize="24" 
+                 Grid.Column="2"  
+                 HorizontalAlignment="Center" 
+                 VerticalAlignment="Center" 
+                 Width="300" Height="34" />
+        
+        <TextBox Foreground="Black" 
+                 BorderBrush="Black" 
+                 x:Name="TajTextBox" 
+                 Text="{Binding Taj}" 
+                 FontSize="24" 
+                 Grid.Column="2" 
+                 Grid.Row="1"  
+                 HorizontalAlignment="Center" 
+                 VerticalAlignment="Center" 
+                 Width="300" Height="34" />
 
-                </Style>
-            </TextBox.Resources>
-        </TextBox>
-        <TextBox Foreground="Black" x:Name="TajTextBox" Text="{Binding Taj}" FontSize="24" Grid.Column="2" Grid.Row="1" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" Width="242" Height="34" >
-            <TextBox.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
+        <TextBox Foreground="Black" 
+                 BorderBrush="Black"  
+                 x:Name="AddressTextBox" 
+                 Text="{Binding Address}" 
+                 FontSize="24" 
+                 Grid.Column="2" 
+                 Grid.Row="2"  
+                 HorizontalAlignment="Center" 
+                 VerticalAlignment="Center" 
+                 Width="300" Height="34" />
+        
+        <TextBox Foreground="Black"  
+                 BorderBrush="Black" 
+                 x:Name="PhoneTextBox" 
+                 Text="{Binding Phone}" 
+                 FontSize="24" 
+                 Grid.Column="2" 
+                 Grid.Row="3"  
+                 HorizontalAlignment="Center" 
+                 VerticalAlignment="Center" 
+                 Width="300" Height="34" />
 
-                </Style>
-            </TextBox.Resources>
-        </TextBox>
-        <TextBox Foreground="Black" x:Name="AddressTextBox" Text="{Binding Address}" FontSize="24" Grid.Column="2" Grid.Row="2" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" Width="242" Height="34" >
-            <TextBox.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-
-                </Style>
-            </TextBox.Resources>
-        </TextBox>
-        <TextBox Foreground="Black" x:Name="PhoneTextBox" Text="{Binding Phone}" FontSize="24" Grid.Column="2" Grid.Row="3" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" Width="242" Height="34" >
-            <TextBox.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-
-                </Style>
-            </TextBox.Resources>
-        </TextBox>
-        <Button Command="{Binding RegisterCommand}" Background="LightGreen" BorderBrush="DarkGreen" BorderThickness="2" Foreground="White" FontSize="20" Grid.Column="2" Content="Register"  Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" Height="38" Width="130">
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-                </Style>
-            </Button.Resources>
-        </Button>
-        <Button Command="{Binding BackCommand}"  Content="Back" Background="LightBlue" BorderBrush="White" BorderThickness="2" Foreground="White" FontSize="16" Margin="10,11,28,0" VerticalAlignment="Top" Height="32">
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-                </Style>
-            </Button.Resources>
-        </Button>
+        <Button Command="{Binding RegisterCommand}" 
+                Background="#009933"  
+                FontWeight="Bold" 
+                BorderBrush="DarkGreen" 
+                BorderThickness="2" 
+                Foreground="White" 
+                FontSize="20" 
+                Grid.Column="2" 
+                Content="Register ↥"  
+                Grid.Row="4" 
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Center" 
+                Height="38" Width="300"/>
+        
+        <Button Command="{Binding BackCommand}" 
+                Content="← Back" 
+                Background="#000066" 
+                FontWeight="Bold"
+                Foreground="White" 
+                FontSize="16" 
+                Grid.Column="1" 
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Left" 
+                Width="100" Height="32"/>
     </Grid>
 </UserControl>

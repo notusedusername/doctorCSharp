@@ -11,10 +11,14 @@
         Width="1300"
         Height="720"
         WindowStyle="SingleBorderWindow"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        MinHeight="680"
+        MinWidth="1280">
     <Window.DataContext>
         <viewmodels:AssistentClientViewModel />
     </Window.DataContext>
+    <Window.Resources>
+    </Window.Resources>
     <Grid >
         <ContentControl Content="{Binding currentView}" />
     </Grid>

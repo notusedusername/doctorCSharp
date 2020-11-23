@@ -19,7 +19,24 @@ namespace AssistentClient.ViewModels
     public class AssistentClientViewModel : INotifyPropertyChanged
     {
         static readonly HttpClient client = new HttpClient();
-        public string Complaint { get; set; }
+        public ObservableCollection<Patient> patients { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+        public static HomeView HomeView = new HomeView();
+        public static RegisterView RegisterView = new RegisterView();
+        private string _complaint { get; set; }
+
+        public string Complaint
+        {
+            get
+            {
+                return _complaint;
+            }
+            set
+            {
+                _complaint = value;
+                OnPropertyChanged("Complaint");
+            }
+        }
         private string _filter;
         public string Filter
         {
@@ -44,8 +61,12 @@ namespace AssistentClient.ViewModels
         public ICommand Refresh { get; }
         public ICommand SwitchViewCommand { get; }
         public Patient selectedPatient { get; set; }
-        public ObservableCollection<Patient> patients { get; set; }
-        public event PropertyChangedEventHandler PropertyChanged;
+        public ICommand RegisterCommand { get; }
+        public ICommand BackCommand { get; }
+        public string Name { get; set; }
+        public string Taj { get; set; }
+        public string Address { get; set; }
+        public string Phone { get; set; }
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
@@ -66,8 +87,6 @@ namespace AssistentClient.ViewModels
             SwitchViewCommand = new DelegateCommand(SwitchView);
             FilterChanged();
         }
-        public static HomeView HomeView = new HomeView();
-        public static RegisterView RegisterView = new RegisterView();
 
         private UserControl _currentView;
         public UserControl currentView
@@ -137,6 +156,7 @@ namespace AssistentClient.ViewModels
                     {
                         MessageBox.Show("Complaint is send to doctor!");
                         Complaint = "";
+                        selectedPatient = null;
                     }
                 }
                 catch (Exceptions.InvalidInputException ex)
@@ -168,6 +188,53 @@ namespace AssistentClient.ViewModels
             {
                 ParseAndShowErrorResponseFromServer(response);
             }
+        }
+        private async void Register()
+        {
+            try
+            {
+                var patient = new Patient();
+                patient.name = Name;
+                patient.phone = Phone;
+                patient.taj = Taj;
+                patient.address = Address;
+
+                var content = new FormUrlEncodedContent(new[]
+                {
+                new KeyValuePair<string, string>("name", patient.name),
+                new KeyValuePair<string, string>("taJ_nr",patient.taj),
+                new KeyValuePair<string, string>("address",patient.address),
+                new KeyValuePair<string, string>("phone",patient.phone)
+            });
+
+                var url = "http://localhost:52218/api/patient";
+                using var client = new HttpClient();
+                var response = await client.PostAsync(url, content);
+                string result = response.Content.ReadAsStringAsync().Result;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ParseAndShowErrorResponseFromServer(response);
+                }
+                else
+                {
+                    MessageBox.Show("New patient succesfully saved!");
+                    Name = "";
+                    Phone = "";
+                    Address = "";
+                    Taj = "";
+                    SwitchView();
+                }
+            }
+            catch (Exceptions.InvalidInputException ex)
+            {
+                MessageBox.Show(ex.message);
+            }
+        }
+        private void BackButton(Window window)
+        {
+            SwitchView();
+            FilterChanged();
         }
         private void handleHttpExceptions(Exception e)
         {
@@ -206,62 +273,6 @@ namespace AssistentClient.ViewModels
             {
                 MessageBox.Show("Something went wrong!", "The server is confused ...", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-        public ICommand RegisterCommand { get; }
-        public ICommand BackCommand { get; }
-        public string Name { get; set; }
-        public string Taj { get; set; }
-        public string Address { get; set; }
-        public string Phone { get; set; }
-
-        private async void Register()
-        {
-            try
-            {
-                var patient = new Patient();
-                patient.name = Name;
-                patient.phone = Phone;
-                patient.taj = Taj;
-                patient.address = Address;
-
-                var content = new FormUrlEncodedContent(new[]
-                {
-                new KeyValuePair<string, string>("name", patient.name),
-                new KeyValuePair<string, string>("taJ_nr",patient.taj),
-                new KeyValuePair<string, string>("address",patient.address),
-                new KeyValuePair<string, string>("phone",patient.phone)
-            });
-
-                var url = "http://localhost:52218/api/patient";
-                using var client = new HttpClient();
-
-                var response = await client.PostAsync(url, content);
-
-                string result = response.Content.ReadAsStringAsync().Result;
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    jsonError err = new jsonError();
-                    err = JsonConvert.DeserializeObject<jsonError>(result);
-                    MessageBox.Show(err.message);
-                }
-                else
-                {
-                    MessageBox.Show("New patient succesfully saved!");
-                    Name = "";
-                    Phone = "";
-                    Address = "";
-                    Taj = "";
-                }
-            }
-            catch (Exceptions.InvalidInputException ex)
-            {
-                MessageBox.Show(ex.message);
-            }
-        }
-        private void BackButton(Window window)
-        {
-            SwitchView();
         }
     }
 
