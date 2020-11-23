@@ -27,15 +27,15 @@ List of patient with basic data.Register new patient and search by name or TAJ.S
 
 ### List of the waiting patients
 
-![DoctorClient](./img/AssistentClient_list.png)
+![AssitentClient](./img/AssistentClient_list.png)
 
 ### Register new patient
 
-![DoctorClient](./img/AssistentClient_register.png)
+![AssitentClient](./img/AssistentClient_register.png)
 
 ### List with registered patient
 
-![DoctorClient](./img/AssistentClient_list2.png)
+![AssitentClient](./img/AssistentClient_list2.png)
 
 ### Filter and select patient
 
@@ -43,7 +43,7 @@ List of patient with basic data.Register new patient and search by name or TAJ.S
 
 ### Send the complaint to doctor
 
-![DoctorClient](./img/AssistentClient_filter_send.png)
+![AssitentClient](./img/AssistentClient_filter_send.png)
 -----
 
 [Specification](https://github.com/arpadracz/ni2020osz/blob/master/Beadando_feladatok/KliensSzerver_Orvos.md)
