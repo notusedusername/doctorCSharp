@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.Net.Http;
 using System.Text;
 using System.Windows;
@@ -18,6 +19,8 @@ namespace AssistentClient.ViewModels
 {
     public class AssistentClientViewModel : INotifyPropertyChanged
     {
+        private readonly string serverUrl = ConfigurationManager.AppSettings["serverUrl"];
+
         static readonly HttpClient client = new HttpClient();
         public ObservableCollection<Patient> patients { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -141,7 +144,7 @@ namespace AssistentClient.ViewModels
                        new KeyValuePair<string, string>("complaint",complaint.complaint)
                        });
 
-                    var url = "http://localhost:52218/api/treatment/active/" + complaint.patient_id.ToString();
+                    var url = serverUrl + "api/treatment/active/" + complaint.patient_id.ToString();
 
                     using var client = new HttpClient();
                     var response = await client.PostAsync(url, content);
@@ -170,7 +173,7 @@ namespace AssistentClient.ViewModels
             HttpResponseMessage response;
             try
             {
-                response = await client.GetAsync("http://localhost:52218/api/patient?filter=" + Filter);
+                response = await client.GetAsync(serverUrl + "api/patient?filter=" + Filter);
             }
             catch (Exception e)
             {
@@ -207,7 +210,7 @@ namespace AssistentClient.ViewModels
                 new KeyValuePair<string, string>("phone",patient.phone)
             });
 
-                var url = "http://localhost:52218/api/patient";
+                var url = serverUrl + "api/patient";
                 using var client = new HttpClient();
                 var response = await client.PostAsync(url, content);
                 string result = response.Content.ReadAsStringAsync().Result;

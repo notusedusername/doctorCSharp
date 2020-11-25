@@ -14,11 +14,14 @@ using System.Windows.Controls;
 using System.Threading;
 using DoctorClient.Model;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace DoctorClient.ViewModels
 {
     class DoctorClientViewModel : INotifyPropertyChanged
     {
+        private readonly string serverUrl = ConfigurationManager.AppSettings["serverUrl"];
+        
         static readonly HttpClient client = new HttpClient();
 
         private string _headerMessage;
@@ -132,7 +135,7 @@ namespace DoctorClient.ViewModels
             HttpResponseMessage response;
             try
             {
-               response = await client.GetAsync("http://localhost:52218/api/treatment/active");
+               response = await client.GetAsync(serverUrl + "api/treatment/active");
             } catch(Exception e)
             {
                 handleHttpExceptions(e);
@@ -183,7 +186,7 @@ namespace DoctorClient.ViewModels
             });
             try
             {
-                response = await client.PutAsync("http://localhost:52218/api/treatment/active/" + selectedPatientData.id, content);
+                response = await client.PutAsync(serverUrl + "api/treatment/active/" + selectedPatientData.id, content);
             }
             catch (Exception e)
             {
@@ -217,7 +220,7 @@ namespace DoctorClient.ViewModels
             });
                 try
                 {
-                    response = await client.PutAsync("http://localhost:52218/api/patient/" + selectedPatientData.id, content);
+                    response = await client.PutAsync(serverUrl + "api/patient/" + selectedPatientData.id, content);
                 }
                 catch (Exception e)
                 {
@@ -247,7 +250,7 @@ namespace DoctorClient.ViewModels
                 HttpResponseMessage response;
                 try
                 {
-                    response = await client.DeleteAsync("http://localhost:52218/api/patient/" + selectedPatientData.id);
+                    response = await client.DeleteAsync(serverUrl + "api/patient/" + selectedPatientData.id);
                 }
                 catch (Exception e)
                 {
@@ -260,6 +263,7 @@ namespace DoctorClient.ViewModels
                     string responseBody = await response.Content.ReadAsStringAsync();
                     patients.Clear();
                     MessageBox.Show(JsonConvert.DeserializeObject<jsonError>(responseBody).message, "Delete patient", MessageBoxButton.OK, MessageBoxImage.Information);
+                    SwitchView();
                 }
                 else
                 {
@@ -288,7 +292,7 @@ namespace DoctorClient.ViewModels
             HttpResponseMessage response;
             try
             {
-                response = await client.GetAsync("http://localhost:52218/api/patient/" + id);
+                response = await client.GetAsync(serverUrl + "api/patient/" + id);
             }
             catch (Exception e)
             {
