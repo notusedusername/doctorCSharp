@@ -27,6 +27,7 @@ namespace DoctorCSharp.Model.Items
 
         public Patient()
         {
+
         }
     }
 }
